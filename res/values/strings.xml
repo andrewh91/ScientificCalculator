@@ -20,6 +20,6 @@
     <string name="button42">0 | .</string>
     <string name="button43">His | Gra</string>
     <string name="button44">Pi | Hyp</string>
-    <string name="displayText">Hello world</string>
+    <string name="displayText">0</string>
 
 </resources>

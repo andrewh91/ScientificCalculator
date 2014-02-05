@@ -12,7 +12,7 @@ public class MainActivity extends Activity
 {
 	public enum operatorFlag{plus,subtract,multiply,divide,power,squareRoot};
 	public operatorFlag flag; 
-	public double number = 0,number1=0;
+	public double number = 0,number1=0, answer=0;
 	public byte decimal=0; 
 	public byte integer=1; 
 	public byte digitNo=0;
@@ -60,6 +60,22 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[1].setOnLongClickListener(new View.OnLongClickListener() //use plus operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				plus(number);
+				return true;
+			}
+		});
+		button[9].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				equalsOp();
+				return true;
+			}
+		});
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
@@ -70,24 +86,50 @@ public class MainActivity extends Activity
 	}
 	  public void appendNumber(View view,int input)//used to enter digits one after another in a traditional calculator fashion
 	  {
-			TextView text = (TextView) findViewById(id.displayText);
 			number=(number*Math.pow(10, integer))+input*(Math.pow(10,-decimal*(digitNo+1)));
 			digitNo= (byte) (digitNo+(1*decimal));
-			text.setText(""+number);  
+			displayNumber(number);
 	  }
-	  public void decimalMode()
+	  public void displayNumber(double input)
+	  {
+		  TextView text = (TextView) findViewById(id.displayText);
+		  text.setText(""+input); 
+	  }
+	  public void appendOperator(CharSequence input)
+	  {
+		  TextView text = (TextView) findViewById(id.displayText);
+		  text.append(input); 
+	  }
+	  public void decimalMode()//switch number entry mode to decimal
 	  {
 		  decimal=1;
 		  integer=0;
 	  }
-	  public void integerMode()
+	  public void integerMode()//set number entry mode to integer, set some other defaults too
 	  {
-		  integer =1;
-		  decimal=0;
+		  integer = 1;//sets integer mode and disable decimal mode
+		  decimal = 0;//sets integer mode and disable decimal mode
+		  digitNo = 0;//resets the number of decimal places
+		  number = 0; //resets the value of the number entered
 	  }
-	  public void plus(View view,double a)
+	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
-		  number1=a;
-		  flag = operatorFlag.plus;
+		  integerMode();
+		  number1=0; //resets number in memory 
+	  }
+	  public void plus(double input)
+	  {
+		  number1+=input;//adds current number to number in memory
+		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
+		  integerMode();//make sure the next number we put in is an integer by default
+		  appendOperator("+");
+	  }
+	  public void equalsOp()
+	  {
+		  switch (flag)
+		  {
+		  case plus: answer = number1 + number; reset();
+		  }
+		  displayNumber(answer);
 	  }
 }
