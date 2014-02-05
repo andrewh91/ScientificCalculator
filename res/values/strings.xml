@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ScientificCalculator</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="button11">1 | +</string>
+    <string name="button12">2 | *</string>
+    <string name="button13">3 | ^</string>
+    <string name="button14">BS | Clr</string>
+    <string name="button21">4 | -</string>
+    <string name="button22">5 | /</string>
+    <string name="button23">6 | Sqrt</string>
+    <string name="button24">Sin | Tan</string>
+    <string name="button31">7 | (</string>
+    <string name="button32">8 | )</string>
+    <string name="button33">9 | =</string>
+    <string name="button34">Cos| Inv</string>
+    <string name="button41">MR | MS</string>
+    <string name="button42">0 | .</string>
+    <string name="button43">His | Gra</string>
+    <string name="button44">Pi | Hyp</string>
+    <string name="displayText">Hello world</string>
+
+</resources>
