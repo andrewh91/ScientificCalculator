@@ -16,6 +16,7 @@ public class MainActivity extends Activity
 	public byte decimal=0; 
 	public byte integer=1; 
 	public byte digitNo=0;
+	public byte subtract = 1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -68,6 +69,14 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				subtract();
+				return true;
+			}
+		});
 		button[9].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
 		{
 			@Override
@@ -86,7 +95,7 @@ public class MainActivity extends Activity
 	}
 	  public void appendNumber(View view,int input)//used to enter digits one after another in a traditional calculator fashion
 	  {
-			number=(number*Math.pow(10, integer))+input*(Math.pow(10,-decimal*(digitNo+1)));
+			number=(number*Math.pow(10, integer))+(input*subtract)*(Math.pow(10,-decimal*(digitNo+1)));
 			digitNo= (byte) (digitNo+(1*decimal));
 			displayNumber(number);
 	  }
@@ -111,18 +120,31 @@ public class MainActivity extends Activity
 		  decimal = 0;//sets integer mode and disable decimal mode
 		  digitNo = 0;//resets the number of decimal places
 		  number = 0; //resets the value of the number entered
+		  subtract = 1;//resets the sign of the next number
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
 		  integerMode();
 		  number1=0; //resets number in memory 
 	  }
-	  public void plus(double input)
+	  public void plus(double input)//don't really need an argument, my variables are public anyway
 	  {
 		  number1+=input;//adds current number to number in memory
 		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
 		  integerMode();//make sure the next number we put in is an integer by default
-		  appendOperator("+");
+		  if(subtract==1)
+		  {
+			  appendOperator("+");
+		  }
+		  else
+		  {
+			  appendOperator("-");
+		  }
+	  }
+	  public void subtract()
+	  {
+		  plus(number);
+		  subtract *= -1;
 	  }
 	  public void equalsOp()
 	  {
