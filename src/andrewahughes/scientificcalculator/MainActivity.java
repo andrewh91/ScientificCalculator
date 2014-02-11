@@ -7,16 +7,18 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 public class MainActivity extends Activity 
 {
-	public enum operatorFlag{plus,subtract,multiply,divide,power,squareRoot};
-	public operatorFlag flag; 
-	public double number = 0,number1=0, answer=0;
+	public enum operatorFlag{none,plus,subtract,multiply,divide,power,squareRoot};
+	public operatorFlag flag=operatorFlag.none; 
+	public BigDecimal number = new BigDecimal(0),number1=new BigDecimal(0), answer=new BigDecimal(0);
 	public byte decimal=0; 
 	public byte integer=1; 
 	public byte digitNo=0;
-	public byte subtract = 1;
+	public BigDecimal subtract = new BigDecimal(1);
 	public char operator = ' ';
 	
 	@Override
@@ -26,29 +28,30 @@ public class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 		
 		Button[] button = new Button[16];
-		button[0]= (Button) findViewById(id.button42);//0
-		button[1]= (Button) findViewById(id.button11);//1
-		button[2]= (Button) findViewById(id.button12);//2
-		button[3]= (Button) findViewById(id.button13);//3
-		button[4]= (Button) findViewById(id.button21);//4
-		button[5]= (Button) findViewById(id.button22);//5
-		button[6]= (Button) findViewById(id.button23);//6
-		button[7]= (Button) findViewById(id.button31);//7
-		button[8]= (Button) findViewById(id.button32);//8
-		button[9]= (Button) findViewById(id.button33);//9
-		button[10]= (Button) findViewById(id.button14);//a
-		button[11]= (Button) findViewById(id.button24);//b
-		button[12]= (Button) findViewById(id.button34);//c
-		button[13]= (Button) findViewById(id.button41);//d
-		button[14]= (Button) findViewById(id.button43);//e
-		button[15]= (Button) findViewById(id.button44);//f
+		button[0]= (Button) findViewById(id.button42);//0	[4,2]
+		button[1]= (Button) findViewById(id.button11);//1	[1,1]
+		button[2]= (Button) findViewById(id.button12);//2	[1,2]
+		button[3]= (Button) findViewById(id.button13);//3	[1,3]
+		button[4]= (Button) findViewById(id.button21);//4	[2,1]
+		button[5]= (Button) findViewById(id.button22);//5	[2,2]
+		button[6]= (Button) findViewById(id.button23);//6	[2,3]
+		button[7]= (Button) findViewById(id.button31);//7	[3,1]
+		button[8]= (Button) findViewById(id.button32);//8	[3,2]
+		button[9]= (Button) findViewById(id.button33);//9	[3,3]
+		button[10]= (Button) findViewById(id.button14);//a	[1,4]
+		button[11]= (Button) findViewById(id.button24);//b	[2,4]
+		button[12]= (Button) findViewById(id.button34);//c	[3,4]
+		button[13]= (Button) findViewById(id.button41);//d	[4,1]
+		button[14]= (Button) findViewById(id.button43);//e	[4,3]
+		button[15]= (Button) findViewById(id.button44);//f	[4,4]
 		for (int i = 0; i < 10; i++)
 		{
-			final int input = i;
+			final BigDecimal input = new BigDecimal(i);
 			button[i].setOnClickListener(new View.OnClickListener() 
 			{
 				public void onClick(View view)
 				{
+					
 					appendNumber(view,input);
 				}
 			});
@@ -66,7 +69,7 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
-				subtract=1;//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
+				subtract=new BigDecimal(1);//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
 				operator ='+';
 				plus(number);
 				return true;
@@ -88,6 +91,28 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[10].setOnClickListener(new View.OnClickListener() //use equals operator
+		{
+			@Override
+			public void onClick(View v) {
+				backSpace();//deletes last digit entered
+			}
+		});
+		button[10].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				clear();//clears display
+				return true;
+			}
+		});
+		button[14].setOnClickListener(new View.OnClickListener() //ans button
+		{
+			@Override
+			public void onClick(View v) {
+				ans();//sets current number to previous answer
+			}
+		});
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
@@ -96,14 +121,14 @@ public class MainActivity extends Activity
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	  public void appendNumber(View view,int input)//used to enter digits one after another in a traditional calculator fashion
+	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
 	  {
-			number=(number*Math.pow(10, integer))+(input*subtract)*(Math.pow(10,-decimal*(digitNo+1)));
+			number=(number.multiply(BigDecimal.TEN.pow(integer))).add((input.multiply(subtract)).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
 			digitNo= (byte) (digitNo+(1*decimal));
 			operator=' ';
 			displayNumber(number);
 	  }
-	  public void displayNumber(double input)
+	  public void displayNumber(BigDecimal input)
 	  {
 		  TextView text = (TextView) findViewById(id.displayText);
 		  text.setText(input+""+operator); 
@@ -112,25 +137,27 @@ public class MainActivity extends Activity
 	  {
 		  decimal=1;
 		  integer=0;
+		  operator = '.';
+		  displayNumber(number);
 	  }
 	  public void integerMode()//set number entry mode to integer, set some other defaults too
 	  {
 		  integer = 1;//sets integer mode and disable decimal mode
 		  decimal = 0;//sets integer mode and disable decimal mode
 		  digitNo = 0;//resets the number of decimal places
-		  number = 0; //resets the value of the number entered
-		  subtract = 1;//resets the sign of the next number
+		  number = new BigDecimal(0); //resets the value of the number entered
+		  subtract = new BigDecimal(1);//resets the sign of the next number
 
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
 		  integerMode();
 		  operator = ' ';//resets the operator symbol
-		  number1=0; //resets number in memory 
+		  number1=new BigDecimal(0); //resets number in memory 
 	  }
-	  public void plus(double input)//don't really need an argument, my variables are public anyway
+	  public void plus(BigDecimal input)//don't really need an argument, my variables are public anyway
 	  {
-		  number1+=input;//adds current number to number in memory
+		  number1=number1.add(input);//adds current number to number in memory
 		  displayNumber(number);//updates the display with the operator 
 		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
 		  integerMode();//make sure the next number we put in is a positive integer by default
@@ -139,14 +166,38 @@ public class MainActivity extends Activity
 	  {
 		  operator ='-';
 		  plus(number);
-		  subtract = -1;
+		  subtract = new BigDecimal(-1);
+	  }
+	  public void backSpace()//undos the last number entered
+	  {
+		  //number = (number/Math.pow(10,integer));//divide by 10
+		  //number = Math.floor(number)+(2+subtract);//round towards negative infinity, 
+		  displayNumber(number);
+	  }
+	  public void clear()//clears display
+	  {
+		  integerMode();
+		  operator = ' ';//resets the operator symbol
+		  displayNumber(number);
+		  flag =operatorFlag.none;
 	  }
 	  public void equalsOp()
 	  {
 		  switch (flag)
 		  {
-		  case plus: answer = number1 + number; reset();
+			  case none: reset();
+			  break;
+			  case plus: answer = number1.add(number); reset();
+			  break;
+			  default: 
+			  break;
+			  
 		  }
 		  displayNumber(answer);
+	  }
+	  public void ans()//answer button, sets current number to last answer
+	  {
+		  number = answer;
+		  displayNumber(number);
 	  }
 }
