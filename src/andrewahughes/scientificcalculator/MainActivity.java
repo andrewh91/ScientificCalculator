@@ -17,6 +17,7 @@ public class MainActivity extends Activity
 	public byte integer=1; 
 	public byte digitNo=0;
 	public byte subtract = 1;
+	public char operator = ' ';
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -65,6 +66,8 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
+				subtract=1;//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
+				operator ='+';
 				plus(number);
 				return true;
 			}
@@ -97,17 +100,13 @@ public class MainActivity extends Activity
 	  {
 			number=(number*Math.pow(10, integer))+(input*subtract)*(Math.pow(10,-decimal*(digitNo+1)));
 			digitNo= (byte) (digitNo+(1*decimal));
+			operator=' ';
 			displayNumber(number);
 	  }
 	  public void displayNumber(double input)
 	  {
 		  TextView text = (TextView) findViewById(id.displayText);
-		  text.setText(""+input); 
-	  }
-	  public void appendOperator(CharSequence input)
-	  {
-		  TextView text = (TextView) findViewById(id.displayText);
-		  text.append(input); 
+		  text.setText(input+""+operator); 
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
@@ -121,30 +120,26 @@ public class MainActivity extends Activity
 		  digitNo = 0;//resets the number of decimal places
 		  number = 0; //resets the value of the number entered
 		  subtract = 1;//resets the sign of the next number
+
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
 		  integerMode();
+		  operator = ' ';//resets the operator symbol
 		  number1=0; //resets number in memory 
 	  }
 	  public void plus(double input)//don't really need an argument, my variables are public anyway
 	  {
 		  number1+=input;//adds current number to number in memory
+		  displayNumber(number);//updates the display with the operator 
 		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
-		  integerMode();//make sure the next number we put in is an integer by default
-		  if(subtract==1)
-		  {
-			  appendOperator("+");
-		  }
-		  else
-		  {
-			  appendOperator("-");
-		  }
+		  integerMode();//make sure the next number we put in is a positive integer by default
 	  }
 	  public void subtract()
 	  {
+		  operator ='-';
 		  plus(number);
-		  subtract *= -1;
+		  subtract = -1;
 	  }
 	  public void equalsOp()
 	  {
