@@ -140,18 +140,21 @@ public class MainActivity extends Activity
 		  operator = '.';
 		  displayNumber(number);
 	  }
-	  public void integerMode()//set number entry mode to integer, set some other defaults too
+	  public void integerMode()
 	  {
 		  integer = 1;//sets integer mode and disable decimal mode
 		  decimal = 0;//sets integer mode and disable decimal mode
 		  digitNo = 0;//resets the number of decimal places
+	  }
+	  public void newNumberMode()//set number entry mode to integer, set some other defaults too
+	  {
+		  integerMode();
 		  number = new BigDecimal(0); //resets the value of the number entered
 		  subtract = new BigDecimal(1);//resets the sign of the next number
-
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
-		  integerMode();
+		  newNumberMode();
 		  operator = ' ';//resets the operator symbol
 		  number1=new BigDecimal(0); //resets number in memory 
 	  }
@@ -160,7 +163,7 @@ public class MainActivity extends Activity
 		  number1=number1.add(input);//adds current number to number in memory
 		  displayNumber(number);//updates the display with the operator 
 		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
-		  integerMode();//make sure the next number we put in is a positive integer by default
+		  newNumberMode();//make sure the next number we put in is a positive integer by default
 	  }
 	  public void subtract()
 	  {
@@ -170,13 +173,22 @@ public class MainActivity extends Activity
 	  }
 	  public void backSpace()//undos the last number entered
 	  {
-		  //number = (number/Math.pow(10,integer));//divide by 10
-		  //number = Math.floor(number)+(2+subtract);//round towards negative infinity, 
+		  number = (number.divide(BigDecimal.TEN.pow(integer)));//divide by 10 if integer
+		  if(digitNo>1)
+		  {
+			  digitNo--;
+		  }
+		  else
+		  {
+			  integerMode();
+			  operator=' ';
+		  }
+		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards zero, digitNo controls decimal places to round to
 		  displayNumber(number);
 	  }
 	  public void clear()//clears display
 	  {
-		  integerMode();
+		  newNumberMode();
 		  operator = ' ';//resets the operator symbol
 		  displayNumber(number);
 		  flag =operatorFlag.none;
