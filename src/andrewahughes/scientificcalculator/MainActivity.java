@@ -75,6 +75,14 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[2].setOnLongClickListener(new View.OnLongClickListener() //use multiply operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				multiply(number);
+				return true;
+			}
+		});
 		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator
 		{
 			@Override
@@ -157,6 +165,7 @@ public class MainActivity extends Activity
 		  newNumberMode();
 		  operator = ' ';//resets the operator symbol
 		  number1=new BigDecimal(0); //resets number in memory 
+		  flag = operatorFlag.none;
 	  }
 	  public void plus(BigDecimal input)//don't really need an argument, my variables are public anyway
 	  {
@@ -164,6 +173,20 @@ public class MainActivity extends Activity
 		  displayNumber(number);//updates the display with the operator 
 		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
+	  }
+	  public void multiply(BigDecimal input)
+	  {
+		  if(flag==operatorFlag.none)
+		  {
+			  number1=input;			  
+		  }
+		  else
+		  {
+			  number1=number1.multiply(input);
+		  }
+		  displayNumber(number);
+		  flag = operatorFlag.multiply;
+		  newNumberMode();
 	  }
 	  public void subtract()
 	  {
@@ -198,6 +221,8 @@ public class MainActivity extends Activity
 		  switch (flag)
 		  {
 			  case none: reset();
+			  break;
+			  case multiply:answer =number1.multiply(number);reset();
 			  break;
 			  case plus: answer = number1.add(number); reset();
 			  break;
