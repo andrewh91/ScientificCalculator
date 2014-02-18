@@ -14,15 +14,12 @@ import java.util.List;
 
 public class MainActivity extends Activity 
 {
-	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,bracket};
-	public operatorFlag flag=operatorFlag.none; 
-	public BigDecimal number = new BigDecimal(0),number1=new BigDecimal(0), answer=new BigDecimal(0);
-	public byte decimal=0; 
-	public byte integer=1; 
-	public byte digitNo=0;
-	public BigDecimal subtract = new BigDecimal(1);
+	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,bracket};//enumerators for BIDMAS order
+	public operatorFlag flag=operatorFlag.none; //initialise 
+	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1);
+	public byte decimal=0,integer=1,digitNo=0; 
 	public char operator = ' ';
-	public class Objects
+	public class Objects//used for history
 	{
 		BigDecimal number;
 		operatorFlag flag;
@@ -32,8 +29,8 @@ public class MainActivity extends Activity
 			flag=f;
 		}
 	}
-	List<Objects> objects =new ArrayList<Objects>();
-	public boolean numberEntered = false;
+	List<Objects> objects =new ArrayList<Objects>();//used to store numbers and calculations in memory
+	public boolean numberEntered = false;//fix bug where 0 was recorded as current number if you press two operators
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -65,7 +62,6 @@ public class MainActivity extends Activity
 			{
 				public void onClick(View view)
 				{
-					
 					appendNumber(view,input);
 				}
 			});
@@ -84,8 +80,8 @@ public class MainActivity extends Activity
 			@Override
 			public boolean onLongClick(View v) {
 				subtract=new BigDecimal(1);//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
-				operator ='+';
-				plus(number);
+				operator ='+';//appends operator here because subtract shares a method with plus, and putting this in the method would overwrite the - 
+				plus();//plus operator
 				return true;
 			}
 		});
@@ -93,7 +89,7 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
-				multiply(number);
+				multiply();//multiply operator
 				return true;
 			}
 		});
@@ -101,7 +97,7 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
-				subtract();
+				subtract();//subtract operator
 				return true;
 			}
 		});
@@ -109,18 +105,18 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
-				equalsOp();
+				equalsOp();//equals operator
 				return true;
 			}
 		});
-		button[10].setOnClickListener(new View.OnClickListener() //use equals operator
+		button[10].setOnClickListener(new View.OnClickListener() //use backspace operator
 		{
 			@Override
 			public void onClick(View v) {
 				backSpace();//deletes last digit entered
 			}
 		});
-		button[10].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
+		button[10].setOnLongClickListener(new View.OnLongClickListener() //use clear operator
 		{
 			@Override
 			public boolean onLongClick(View v) {
@@ -144,26 +140,26 @@ public class MainActivity extends Activity
 		return true;
 	}
 	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
-	  {
+	  {	//the following calculation appends positive and negative, integer and decimal numbers as they are entered 
 			number=(number.multiply(BigDecimal.TEN.pow(integer))).add((input.multiply(subtract)).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
-			digitNo= (byte) (digitNo+(1*decimal));
-			operator=' ';
-			displayNumber(number);
-			numberEntered = true;
+			digitNo= (byte) (digitNo+(1*decimal));//keeps track of decimal places etc
+			operator=' ';//clears operator from previous display
+			displayNumber(number);//updates the display
+			numberEntered = true;//record the fact that the most recent action was a number being entered
 	  }
-	  public void displayNumber(BigDecimal input)
+	  public void displayNumber(BigDecimal input)//updates the display, with supplied argument, could be current number or answer
 	  {
-		  TextView text = (TextView) findViewById(id.displayText);
-		  text.setText(input+""+operator); 
+		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
+		  text.setText(input+""+operator); //sets text to the number entered, and an operator if one is pressed
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
-		  decimal=1;
+		  decimal=1;//sets values used in appendNumber method
 		  integer=0;
-		  operator = '.';
-		  displayNumber(number);
+		  operator = '.';//shows the decimal point after the number to confirm we are in decimal mode
+		  displayNumber(number);//updates display
 	  }
-	  public void integerMode()
+	  public void integerMode()//switch number entry mode to integer
 	  {
 		  integer = 1;//sets integer mode and disable decimal mode
 		  decimal = 0;//sets integer mode and disable decimal mode
@@ -177,98 +173,88 @@ public class MainActivity extends Activity
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
-		  newNumberMode();
+		  newNumberMode();//sets defaults to prepare for a new number,  
 		  operator = ' ';//resets the operator symbol
-		  number1=new BigDecimal(0); //resets number in memory 
-		  flag = operatorFlag.none;
+		  flag = operatorFlag.none;//resets the operator flag, ready for a new calculation 
 	  }
-	  public void addToHistory(BigDecimal number,operatorFlag flag)
+	  public void addNumToHistory(BigDecimal number)//adds current number to history list
 	  {
-		  if(numberEntered)	
+		  if(numberEntered)	//if the last thing entered is a number i.e. not an operator
 		  {
-			  objects.add(new Objects(number,flag));
+			  objects.add(new Objects(number,operatorFlag.none));//add the current number to a list
 		  }
 		  numberEntered=false;
 	  }
-	  public void plus(BigDecimal input)//don't really need an argument, my variables are public anyway
+	  public void multiply()//adds current number to memory, sets flag o multiply for equals method
 	  {
-		  addToHistory(input, operatorFlag.none);
-		  displayNumber(number);//updates the display with the operator 
+		  addNumToHistory(number);//adds current number to memory
+		  operator = '*';//sets the operator
+		  displayNumber(number);//updates the display with the operator
+		  if(flag.compareTo(operatorFlag.multiply)<0)//if current flag is of less or equal BIDMAS importance...
+		  {
+			  flag = operatorFlag.multiply;//...set flag to determine what "=" does when pressed			  
+		  }
+		  
+		  newNumberMode();//make sure the next number we enter is a positive integer by default
+	  }
+	  public void plus()//adds current number to memory, sets flag to plus so that plus is called during equals method
+	  {
+		  addNumToHistory(number);//adds current number to memory
+		  displayNumber(number);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
 		  if(flag.compareTo(operatorFlag.plus)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.plus;//...set flag to determine what "=" does when pressed			  
 		  }
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
 	  }
-	  public void multiply(BigDecimal input)
+	  public void subtract()//calls plus in case the intention is subtraction, also sets next number to negative sign
 	  {
-		  /*if(flag==operatorFlag.none)// old method, needed to make a string of calculations
-		  {
-			  number1=input;			  
-		  }
-		  else
-		  {
-			  number1=number1.multiply(input);
-		  }*/
-		  addToHistory(input, operatorFlag.none);
-		  operator = '*';
-		  displayNumber(number);
-		  if(flag.compareTo(operatorFlag.multiply)<0)//if current flag is of less or equal BIDMAS importance...
-		  {
-			  flag = operatorFlag.multiply;//...set flag to determine what "=" does when pressed			  
-		  }
-		  
-		  newNumberMode();
-		  
+		  operator ='-';//appends - operator to confirm button was pressed
+		  plus();//call plus because subtraction is the same a addition but with negative numbers
+		  subtract = new BigDecimal(-1);//this sets the subtract variable which affects the appendNumber method
 	  }
-	  public void subtract()
+	  public void backSpace()//undoes the last number entered
 	  {
-		  operator ='-';
-		  plus(number);
-		  subtract = new BigDecimal(-1);
-		  
-	  }
-	  public void backSpace()//undos the last number entered
-	  {
-		  number = (number.divide(BigDecimal.TEN.pow(integer)));//divide by 10 if integer
-		  if(digitNo>1)
+		  number = (number.divide(BigDecimal.TEN.pow(integer)));//divide number by 10 if integer
+		  if(digitNo>1)//if number of decimal places is more than 1 ...
 		  {
-			  digitNo--;
+			  digitNo--;//...reduce the number of decimal places
 		  }
-		  else
+		  else//if decimal places <=1 when backspace is pushed...
 		  {
-			  integerMode();
-			  operator=' ';
+			  integerMode();//...then we have to change from decimal to integer mode 
+			  operator=' ';//clear the decimal place operator to show we have passed back into integer mode
 		  }
-		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards zero, digitNo controls decimal places to round to
-		  displayNumber(number);
+		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards 0 to clean up after we divided by 10 earlier
+		  displayNumber(number);//updates display
 	  }
 	  public void clear()//clears display
 	  {
-		  newNumberMode();
+		  newNumberMode();//prepare for  new number to be entered
 		  operator = ' ';//resets the operator symbol
-		  displayNumber(number);
-		  flag =operatorFlag.none;
+		  displayNumber(number);//updates display
+		  flag =operatorFlag.none;//resets operator flag ready for a new calculation 
 	  }
-	  public void equalsOp()
+	  public void ans()//answer button, sets current number to last answer
 	  {
-		  switch (flag)
+		  number = answer;//simply add current number to previous answer
+		  displayNumber(number);//update display
+	  }
+	  public void equalsOp()//method which performs calculations
+	  {
+		  switch (flag)//detect what current flag is 
 		  {
-			  case none: reset();
-			  break;
-			  case multiply: addToHistory(number, operatorFlag.none); answer = objects.get(objects.size()-2).number.multiply(objects.get(objects.size()-1).number);reset();
-			  break;
-			  case plus: addToHistory(number, operatorFlag.none); answer = objects.get(objects.size()-2).number.add(objects.get(objects.size()-1).number); reset();
-			  break;
+			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
+			  break;//break the statement, no need to carry on as the following cases can not be true
+			  case multiply: addNumToHistory(number); answer = objects.get(objects.size()-2).number.multiply(objects.get(objects.size()-1).number);
+			  break;//add current number to history, multiply the 2nd to last number entered with the last number entered
+			  case plus: addNumToHistory(number); answer = objects.get(objects.size()-2).number.add(objects.get(objects.size()-1).number); 
+			  break;//add current number to history, add the 2nd to last number entered with the last number entered
 			  default: 
 			  break;
 			  
 		  }
-		  displayNumber(answer);
-	  }
-	  public void ans()//answer button, sets current number to last answer
-	  {
-		  number = answer;
-		  displayNumber(number);
+		  reset();//reset ready for a new calculation
+		  displayNumber(answer);//update the display with the answer
 	  }
 }
