@@ -9,10 +9,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity 
 {
-	public enum operatorFlag{none,plus,subtract,multiply,divide,power,squareRoot};
+	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,bracket};
 	public operatorFlag flag=operatorFlag.none; 
 	public BigDecimal number = new BigDecimal(0),number1=new BigDecimal(0), answer=new BigDecimal(0);
 	public byte decimal=0; 
@@ -20,6 +22,18 @@ public class MainActivity extends Activity
 	public byte digitNo=0;
 	public BigDecimal subtract = new BigDecimal(1);
 	public char operator = ' ';
+	public class Objects
+	{
+		BigDecimal number;
+		operatorFlag flag;
+		Objects(BigDecimal n ,operatorFlag f) 
+		{
+			number=n;
+			flag=f;
+		}
+	}
+	List<Objects> objects =new ArrayList<Objects>();
+	public boolean numberEntered = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -135,6 +149,7 @@ public class MainActivity extends Activity
 			digitNo= (byte) (digitNo+(1*decimal));
 			operator=' ';
 			displayNumber(number);
+			numberEntered = true;
 	  }
 	  public void displayNumber(BigDecimal input)
 	  {
@@ -167,32 +182,51 @@ public class MainActivity extends Activity
 		  number1=new BigDecimal(0); //resets number in memory 
 		  flag = operatorFlag.none;
 	  }
+	  public void addToHistory(BigDecimal number,operatorFlag flag)
+	  {
+		  if(numberEntered)	
+		  {
+			  objects.add(new Objects(number,flag));
+		  }
+		  numberEntered=false;
+	  }
 	  public void plus(BigDecimal input)//don't really need an argument, my variables are public anyway
 	  {
-		  number1=number1.add(input);//adds current number to number in memory
+		  addToHistory(input, operatorFlag.none);
 		  displayNumber(number);//updates the display with the operator 
-		  flag = operatorFlag.plus;//sets flag to determine what "=" does when pressed
+		  if(flag.compareTo(operatorFlag.plus)<0)//if current flag is of less or equal BIDMAS importance...
+		  {
+			  flag = operatorFlag.plus;//...set flag to determine what "=" does when pressed			  
+		  }
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
 	  }
 	  public void multiply(BigDecimal input)
 	  {
-		  if(flag==operatorFlag.none)
+		  /*if(flag==operatorFlag.none)// old method, needed to make a string of calculations
 		  {
 			  number1=input;			  
 		  }
 		  else
 		  {
 			  number1=number1.multiply(input);
-		  }
+		  }*/
+		  addToHistory(input, operatorFlag.none);
+		  operator = '*';
 		  displayNumber(number);
-		  flag = operatorFlag.multiply;
+		  if(flag.compareTo(operatorFlag.multiply)<0)//if current flag is of less or equal BIDMAS importance...
+		  {
+			  flag = operatorFlag.multiply;//...set flag to determine what "=" does when pressed			  
+		  }
+		  
 		  newNumberMode();
+		  
 	  }
 	  public void subtract()
 	  {
 		  operator ='-';
 		  plus(number);
 		  subtract = new BigDecimal(-1);
+		  
 	  }
 	  public void backSpace()//undos the last number entered
 	  {
@@ -222,9 +256,9 @@ public class MainActivity extends Activity
 		  {
 			  case none: reset();
 			  break;
-			  case multiply:answer =number1.multiply(number);reset();
+			  case multiply: addToHistory(number, operatorFlag.none); answer = objects.get(objects.size()-2).number.multiply(objects.get(objects.size()-1).number);reset();
 			  break;
-			  case plus: answer = number1.add(number); reset();
+			  case plus: addToHistory(number, operatorFlag.none); answer = objects.get(objects.size()-2).number.add(objects.get(objects.size()-1).number); reset();
 			  break;
 			  default: 
 			  break;
