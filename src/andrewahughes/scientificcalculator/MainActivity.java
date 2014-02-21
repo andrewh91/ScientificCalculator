@@ -93,6 +93,14 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[3].setOnLongClickListener(new View.OnLongClickListener() //use power operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				power();//power operator
+				return true;
+			}
+		});
 		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator
 		{
 			@Override
@@ -162,10 +170,13 @@ public class MainActivity extends Activity
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
-		  decimal=1;//sets values used in appendNumber method
-		  integer=0;
-		  operator = '.';//shows the decimal point after the number to confirm we are in decimal mode
-		  displayNumber(number);//updates display
+		  if(flag.compareTo(operatorFlag.power)!=0)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
+		  {
+			  decimal=1;//sets values used in appendNumber method
+			  integer=0;
+			  operator = '.';//shows the decimal point after the number to confirm we are in decimal mode
+			  displayNumber(number);//updates display
+		  }
 	  }
 	  public void integerMode()//switch number entry mode to integer
 	  {
@@ -193,9 +204,20 @@ public class MainActivity extends Activity
 		  }
 		  numberEntered=false;
 	  }
+	  public void power()//adds current number to memory, sets flag to power, so the equals method will raise the initial number to the power of the second in memory
+	  {
+		  addNumToHistory(number);//adds current number to memory
+		  operator='^';//sets the operator
+		  displayNumber(number);//updates the display with the operator
+		  if(flag.compareTo(operatorFlag.power)<0)//if current flag is of less or equal BIDMAS importance...
+		  {
+			  flag = operatorFlag.power;//...set flag to determine what "=" does when pressed	
+		  }
+		  newNumberMode();//make sure the next number we enter is a positive integer by default
+	  }
 	  public void divide()//adds current number to memory, sets flag to divide, so the equals method will divide the numbers in memory
 	  {
-		  addNumToHistory(number);
+		  addNumToHistory(number);//adds current number to memory
 		  operator='/';//sets the operator
 		  displayNumber(number);//updates the display with the operator
 		  if(flag.compareTo(operatorFlag.divide)<0)//if current flag is of less or equal BIDMAS importance...
@@ -265,6 +287,8 @@ public class MainActivity extends Activity
 		  {
 			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
 			  break;//break the statement, no need to carry on as the following cases can not be true
+			  case power: addNumToHistory(number); answer = objects.get(objects.size()-2).number.pow(objects.get(objects.size()-1).number.intValue(),MathContext.DECIMAL64);
+			  break;//add current number to history, raise the 1st number entered to last number entered 
 			  case divide: addNumToHistory(number); answer = objects.get(objects.size()-2).number.divide(objects.get(objects.size()-1).number,MathContext.DECIMAL64);
 			  break;//add current number to history, divide the 2nd to last number entered by the last number entered
 			  case multiply: addNumToHistory(number); answer = objects.get(objects.size()-2).number.multiply(objects.get(objects.size()-1).number);
