@@ -101,6 +101,14 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[5].setOnLongClickListener(new View.OnLongClickListener() //use divide operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				divide();//divide operator
+				return true;
+			}
+		});
 		button[9].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
 		{
 			@Override
@@ -185,6 +193,17 @@ public class MainActivity extends Activity
 		  }
 		  numberEntered=false;
 	  }
+	  public void divide()//adds current number to memory, sets flag to divide, so the equals method will divide the numbers in memory
+	  {
+		  addNumToHistory(number);
+		  operator='/';//sets the operator
+		  displayNumber(number);//updates the display with the operator
+		  if(flag.compareTo(operatorFlag.divide)<0)//if current flag is of less or equal BIDMAS importance...
+		  {
+			  flag = operatorFlag.divide;//...set flag to determine what "=" does when pressed	
+		  }
+		  newNumberMode();//make sure the next number we enter is a positive integer by default
+	  }
 	  public void multiply()//adds current number to memory, sets flag o multiply for equals method
 	  {
 		  addNumToHistory(number);//adds current number to memory
@@ -194,7 +213,6 @@ public class MainActivity extends Activity
 		  {
 			  flag = operatorFlag.multiply;//...set flag to determine what "=" does when pressed			  
 		  }
-		  
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 	  }
 	  public void plus()//adds current number to memory, sets flag to plus so that plus is called during equals method
@@ -237,6 +255,7 @@ public class MainActivity extends Activity
 	  }
 	  public void ans()//answer button, sets current number to last answer
 	  {
+		  numberEntered=true;
 		  number = answer;//simply add current number to previous answer
 		  displayNumber(number);//update display
 	  }
@@ -246,6 +265,8 @@ public class MainActivity extends Activity
 		  {
 			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
 			  break;//break the statement, no need to carry on as the following cases can not be true
+			  case divide: addNumToHistory(number); answer = objects.get(objects.size()-2).number.divide(objects.get(objects.size()-1).number,MathContext.DECIMAL64);
+			  break;//add current number to history, divide the 2nd to last number entered by the last number entered
 			  case multiply: addNumToHistory(number); answer = objects.get(objects.size()-2).number.multiply(objects.get(objects.size()-1).number);
 			  break;//add current number to history, multiply the 2nd to last number entered with the last number entered
 			  case plus: addNumToHistory(number); answer = objects.get(objects.size()-2).number.add(objects.get(objects.size()-1).number); 
