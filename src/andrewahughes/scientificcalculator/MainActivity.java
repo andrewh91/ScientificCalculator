@@ -16,7 +16,7 @@ public class MainActivity extends Activity
 {
 	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,sqrt,bracket};//enumerators for BIDMAS order
 	public operatorFlag flag=operatorFlag.none; //initialise 
-	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1);
+	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1),memoryStore=new BigDecimal(0);
 	public byte decimal=0,integer=1,digitNo=0; 
 	public char operator = ' ';
 	public class Objects//used for history
@@ -145,6 +145,21 @@ public class MainActivity extends Activity
 			@Override
 			public boolean onLongClick(View v) {
 				clear();//clears display
+				return true;
+			}
+		});
+		button[13].setOnClickListener(new View.OnClickListener() //memory recall button
+		{
+			@Override
+			public void onClick(View v) {
+				mr();//sets current number to stored number
+			}
+		});
+		button[13].setOnLongClickListener(new View.OnLongClickListener() //memory store button
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				ms();//sets stored number to current number
 				return true;
 			}
 		});
@@ -294,11 +309,22 @@ public class MainActivity extends Activity
 		  displayNumber(number);//updates display
 		  flag =operatorFlag.none;//resets operator flag ready for a new calculation 
 	  }
+	  public void ms()//memory store button, sets stored number to current number
+	  {
+		  memoryStore = number;//store current number to variable
+		  displayNumber(number);//update display
+	  }
+	  public void mr()//memory recall button, sets current number to stored number
+	  {
+		  number = memoryStore.multiply(subtract);//set current number to stored variable
+		  displayNumber(number);//update display
+		  numberEntered=true;
+	  }
 	  public void ans()//answer button, sets current number to last answer
 	  {
-		  numberEntered=true;
-		  number = answer;//simply add current number to previous answer
+		  number = answer.multiply(subtract);//simply add current number to previous answer
 		  displayNumber(number);//update display
+		  numberEntered=true;
 	  }
 	  public void equalsOp()//method which performs calculations
 	  {
