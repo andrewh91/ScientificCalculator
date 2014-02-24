@@ -18,7 +18,9 @@ public class MainActivity extends Activity
 	public operatorFlag flag=operatorFlag.none; //initialise 
 	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1),memoryStore=new BigDecimal(0);
 	public byte decimal=0,integer=1,digitNo=0; 
-	public char operator = ' ';
+	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
+	public boolean inverse=false,hyperbolic=false;
+	double d;//used in trig
 	public class Objects//used for history
 	{
 		BigDecimal number;
@@ -148,6 +150,36 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[11].setOnClickListener(new View.OnClickListener() //use sine operator
+		{
+			@Override
+			public void onClick(View v) {
+				sin();
+			}
+		});
+		button[11].setOnLongClickListener(new View.OnLongClickListener() //use tangent operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				tan();
+				return true;
+			}
+		});
+		button[12].setOnClickListener(new View.OnClickListener() //use cosine operator
+		{
+			@Override
+			public void onClick(View v) {
+				cos();
+			}
+		});
+		button[12].setOnLongClickListener(new View.OnLongClickListener() //set inverse 
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				inv();
+				return true;
+			}
+		});
 		button[13].setOnClickListener(new View.OnClickListener() //memory recall button
 		{
 			@Override
@@ -170,6 +202,21 @@ public class MainActivity extends Activity
 				ans();//sets current number to previous answer
 			}
 		});
+		button[15].setOnClickListener(new View.OnClickListener() //PI button
+		{
+			@Override
+			public void onClick(View v) {
+				pi();//sets current number to PI
+			}
+		});
+		button[15].setOnLongClickListener(new View.OnLongClickListener() //sets hyperbolic
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				hyp();
+				return true;
+			}
+		});
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
@@ -189,7 +236,7 @@ public class MainActivity extends Activity
 	  public void displayNumber(BigDecimal input)//updates the display, with supplied argument, could be current number or answer
 	  {
 		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
-		  text.setText(input+""+operator); //sets text to the number entered, and an operator if one is pressed
+		  text.setText(input+""+operator+inverseChar+hyperbolicChar); //sets text to the number entered, and an operator if one is pressed
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
@@ -206,6 +253,10 @@ public class MainActivity extends Activity
 		  integer = 1;//sets integer mode and disable decimal mode
 		  decimal = 0;//sets integer mode and disable decimal mode
 		  digitNo = 0;//resets the number of decimal places
+		  inverse=false;
+		  hyperbolic=false;
+		  hyperbolicChar=' ';
+		  inverseChar=' ';
 	  }
 	  public void newNumberMode()//set number entry mode to integer, set some other defaults too
 	  {
@@ -309,6 +360,129 @@ public class MainActivity extends Activity
 		  displayNumber(number);//updates display
 		  flag =operatorFlag.none;//resets operator flag ready for a new calculation 
 	  }
+	  public void sin()//uses the sin, arcsin or sinh trig function according to the value of the inverse and hyperbolic flags
+	  {
+		  d=number.doubleValue();
+		  if(!inverse&&!hyperbolic)
+		  {
+			  d=Math.sin(d);
+		  }
+		  else if(inverse&&!hyperbolic)
+		  {
+			  d=Math.asin(d);
+		  }
+		  else if(!inverse&&hyperbolic)
+		  {
+			  d=Math.sinh(d);
+		  }
+		  else //if(inverse&&hyperbolic);
+		  {
+			  //make an inverse hyperbolic function
+		  }
+		  number=new BigDecimal(d);
+		  answer=number;//sets answer to number so we can use ans button to carry on calculation
+		  integerMode();//clear the inverse or hyperbolic char if present
+		  displayNumber(number);
+		  numberEntered=true;
+		  newNumberMode();
+	  }
+	  public void cos()//uses the cos, arccos or cosh trig function according to the value of the inverse and hyperbolic flags
+	  {
+		  d=number.doubleValue();
+		  if(!inverse&&!hyperbolic)
+		  {
+			  d=Math.cos(d);
+		  }
+		  else if(inverse&&!hyperbolic)
+		  {
+			  d=Math.acos(d);
+		  }
+		  else if(!inverse&&hyperbolic)
+		  {
+			  d=Math.cosh(d);
+		  }
+		  else //if(inverse&&hyperbolic);
+		  {
+			  //make an inverse hyperbolic function
+		  }
+		  number=new BigDecimal(d);
+		  answer=number;//sets answer to number so we can use ans button to carry on calculation
+		  integerMode();//clear the inverse or hyperbolic char if present
+		  displayNumber(number);
+		  numberEntered=true;
+		  newNumberMode();
+	  }
+	  public void tan()//uses the tan, arctan or tanh trig function according to the value of the inverse and hyperbolic flags
+	  {
+		  d=number.doubleValue();
+		  if(!inverse&&!hyperbolic)
+		  {
+			  d=Math.tan(d);
+		  }
+		  else if(inverse&&!hyperbolic)
+		  {
+			  d=Math.atan(d);
+		  }
+		  else if(!inverse&&hyperbolic)
+		  {
+			  d=Math.tanh(d);
+		  }
+		  else //if(inverse&&hyperbolic);
+		  {
+			  //make an inverse hyperbolic function
+		  }
+		  number=new BigDecimal(d);
+		  answer=number;//sets answer to number so we can use ans button to carry on calculation
+		  integerMode();//clear the inverse or hyperbolic char if present
+		  displayNumber(number);
+		  numberEntered=true;
+		  newNumberMode();
+	  }
+	  public void inv()//sets the inverse flag to determine which trig function we use
+	  {
+		  if(inverse)
+		  {
+			  inverse=false;
+			  inverseChar=' ';
+		  }
+		  else
+		  {
+			  inverse=true;
+			  inverseChar='i';
+		  }
+		  displayNumber(number);
+	  }
+	  public void pi()
+	  {
+		  number = subtract.multiply(new BigDecimal(Math.PI));//equate the current number to PI, or minus PI
+		  answer=number;//sets answer to number so we can use ans button to carry on calculation
+		  displayNumber(number);//update display
+		  numberEntered=true;
+	  }
+	  public void hyp()//sets the hyperbolic flag to determine which trig function we use
+	  {
+		  if(hyperbolic)
+		  {
+			  hyperbolic=false;
+			  hyperbolicChar=' ';
+		  }
+		  else
+		  {
+			  hyperbolic=true;
+			  hyperbolicChar='h';
+		  }
+		  displayNumber(number);
+	  }
+	  public void ans()//answer button, sets current number to last answer
+	  {
+		  number = answer.multiply(subtract);//simply add current number to previous answer
+		  displayNumber(number);//update display
+		  numberEntered=true;
+	  }
+	  public void his()
+	  {
+		  
+	  }
 	  public void ms()//memory store button, sets stored number to current number
 	  {
 		  memoryStore = number;//store current number to variable
@@ -317,12 +491,6 @@ public class MainActivity extends Activity
 	  public void mr()//memory recall button, sets current number to stored number
 	  {
 		  number = memoryStore.multiply(subtract);//set current number to stored variable
-		  displayNumber(number);//update display
-		  numberEntered=true;
-	  }
-	  public void ans()//answer button, sets current number to last answer
-	  {
-		  number = answer.multiply(subtract);//simply add current number to previous answer
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
