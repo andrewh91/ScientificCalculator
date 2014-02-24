@@ -14,7 +14,7 @@ import java.util.List;
 
 public class MainActivity extends Activity 
 {
-	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,bracket};//enumerators for BIDMAS order
+	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,sqrt,bracket};//enumerators for BIDMAS order
 	public operatorFlag flag=operatorFlag.none; //initialise 
 	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1);
 	public byte decimal=0,integer=1,digitNo=0; 
@@ -117,6 +117,14 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[6].setOnLongClickListener(new View.OnLongClickListener() //use root operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				root();//root operator
+				return true;
+			}
+		});
 		button[9].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
 		{
 			@Override
@@ -204,6 +212,17 @@ public class MainActivity extends Activity
 		  }
 		  numberEntered=false;
 	  }
+	  public void root()
+	  {
+		  addNumToHistory(number);//adds current number to memory
+		  operator='r';//sets the operator
+		  displayNumber(number);//updates the display with the operator
+		  if(flag.compareTo(operatorFlag.sqrt)<0)//if current flag is of less or equal BIDMAS importance...
+		  {
+			  flag = operatorFlag.sqrt;//...set flag to determine what "=" does when pressed	
+		  }
+		  newNumberMode();//make sure the next number we enter is a positive integer by default
+	  }
 	  public void power()//adds current number to memory, sets flag to power, so the equals method will raise the initial number to the power of the second in memory
 	  {
 		  addNumToHistory(number);//adds current number to memory
@@ -287,6 +306,17 @@ public class MainActivity extends Activity
 		  {
 			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
 			  break;//break the statement, no need to carry on as the following cases can not be true
+			  case sqrt:  
+			  BigDecimal halfNumber = objects.get(objects.size()-1).number.divide(new BigDecimal(2),MathContext.DECIMAL64);//divide number by 2
+			  BigDecimal estimate = objects.get(objects.size()-1).number.divide(halfNumber,MathContext.DECIMAL64);//new estimate number to 
+			  BigDecimal average = (halfNumber.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//find average of half the number and the estimate
+			  for(int i=0;i<50;i++)
+			  {
+				  estimate=objects.get(objects.size()-1).number.divide(average,MathContext.DECIMAL64);//new estimate should equal the number divided by the previous average
+				  average=(average.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//average the current average and estimate
+			  }
+			  answer=average;//the more iterations we complete the closer we can approximate an answer.
+			  break;//add current number to history, raise the 1st number entered to last number entered 
 			  case power: addNumToHistory(number); answer = objects.get(objects.size()-2).number.pow(objects.get(objects.size()-1).number.intValue(),MathContext.DECIMAL64);
 			  break;//add current number to history, raise the 1st number entered to last number entered 
 			  case divide: addNumToHistory(number); answer = objects.get(objects.size()-2).number.divide(objects.get(objects.size()-1).number,MathContext.DECIMAL64);
