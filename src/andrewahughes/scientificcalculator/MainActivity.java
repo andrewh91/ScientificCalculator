@@ -524,6 +524,7 @@ public class MainActivity extends Activity
 			  
 		  }
 		  reset();//reset ready for a new calculation
+		  ans();
 		  displayNumber(answer);//update the display with the answer
 	  }
 }
