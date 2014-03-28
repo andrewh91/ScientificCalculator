@@ -15,20 +15,28 @@ import java.util.List;
 public class MainActivity extends Activity 
 {
 	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,sqrt,bracket};//enumerators for BIDMAS order
-	public operatorFlag flag=operatorFlag.none; //initialise 
+	public operatorFlag flag=operatorFlag.none; //initialise
+	public operatorFlag currentOperatorFlag= operatorFlag.none;//used to set operator flag of number as soon as you enter it
 	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1),memoryStore=new BigDecimal(0);
 	public byte decimal=0,integer=1,digitNo=0; 
 	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
 	public boolean inverse=false,hyperbolic=false;
 	double d;//used in trig
+	int currentBracketNo=0;
+	
 	public class Objects//used for history
 	{
 		BigDecimal number;
 		operatorFlag flag;
+		operatorFlag operator1;
+		operatorFlag operator2;
+		int bracketNo;
 		Objects(BigDecimal n ,operatorFlag f) 
 		{
 			number=n;
 			flag=f;
+			operator2= f;
+			
 		}
 	}
 	List<Objects> objects =new ArrayList<Objects>();//used to store numbers and calculations in memory
@@ -232,6 +240,8 @@ public class MainActivity extends Activity
 			operator=' ';//clears operator from previous display
 			displayNumber(number);//updates the display
 			numberEntered = true;//record the fact that the most recent action was a number being entered
+			
+			//TODO need to set the operator flag of new numbers if required
 	  }
 	  public void displayNumber(BigDecimal input)//updates the display, with supplied argument, could be current number or answer
 	  {
@@ -274,9 +284,13 @@ public class MainActivity extends Activity
 	  {
 		  if(numberEntered)	//if the last thing entered is a number i.e. not an operator
 		  {
-			  objects.add(new Objects(number,operatorFlag.none));//add the current number to a list
+			  objects.add(new Objects(number,currentOperatorFlag));//add the current number to a list, with the current operator flag as one of it's flags
 		  }
 		  numberEntered=false;
+	  }
+	  void setOperatorFlag(operatorFlag newOperatorFlag)// a method to set the current number's flag to the operator being pressed
+	  {
+		  objects.get(objects.size()-1).operator1= newOperatorFlag;
 	  }
 	  public void root()
 	  {
@@ -326,6 +340,13 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);//adds current number to memory
 		  displayNumber(number);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
+		  
+		  //TODO modify all operator methods to set flags on the number
+		  objects.get(objects.size()-1).operator1=operatorFlag.plus;
+		  objects.get(objects.size()-1).bracketNo = currentBracketNo;
+		  currentOperatorFlag=operatorFlag.plus;
+		  setOperatorFlag(operatorFlag.plus);
+		  
 		  if(flag.compareTo(operatorFlag.plus)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.plus;//...set flag to determine what "=" does when pressed			  
@@ -496,6 +517,7 @@ public class MainActivity extends Activity
 	  }
 	  public void equalsOp()//method which performs calculations
 	  {
+		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
 		  switch (flag)//detect what current flag is 
 		  {
 			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
