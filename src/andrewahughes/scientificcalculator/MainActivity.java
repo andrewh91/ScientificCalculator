@@ -22,7 +22,7 @@ public class MainActivity extends Activity
 	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
 	public boolean inverse=false,hyperbolic=false;
 	double d;//used in trig
-	int currentBracketNo=0;
+	int currentBracket=0,highestBracket=0;
 	
 	public class Objects//used for history
 	{
@@ -36,6 +36,7 @@ public class MainActivity extends Activity
 			number=n;
 			flag=f;
 			operator2= f;
+			bracketNo= currentBracket;
 			
 		}
 	}
@@ -308,6 +309,12 @@ public class MainActivity extends Activity
 		  addNumToHistory(number);//adds current number to memory
 		  operator='^';//sets the operator
 		  displayNumber(number);//updates the display with the operator
+		  //TODO
+		  objects.get(objects.size()-1).operator1=operatorFlag.power;
+		  //objects.get(objects.size()-1).bracketNo = currentBracket;//assign this when new object is created instead
+		  currentOperatorFlag=operatorFlag.power;
+		  setOperatorFlag(operatorFlag.power);
+		  
 		  if(flag.compareTo(operatorFlag.power)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.power;//...set flag to determine what "=" does when pressed	
@@ -343,7 +350,7 @@ public class MainActivity extends Activity
 		  
 		  //TODO modify all operator methods to set flags on the number
 		  objects.get(objects.size()-1).operator1=operatorFlag.plus;
-		  objects.get(objects.size()-1).bracketNo = currentBracketNo;
+		  //objects.get(objects.size()-1).bracketNo = currentBracket;//assign this when new object is created instead
 		  currentOperatorFlag=operatorFlag.plus;
 		  setOperatorFlag(operatorFlag.plus);
 		  
@@ -515,9 +522,30 @@ public class MainActivity extends Activity
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
+	  public void openBracket(){
+		  highestBracket++;
+		  currentBracket++;
+	  }
+	  public void closeBracket(){
+		  currentBracket--;
+	  }
 	  public void equalsOp()//method which performs calculations
 	  {
 		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
+		  for(int i=highestBracket;i>=0;i--)
+		  {
+			  for(int j= 0;j<objects.size();j++)
+			  {
+				  if(objects.get(j).bracketNo==i)
+				  {
+					  if (objects.get(j).operator1==operatorFlag.power)
+					  {
+						addNumToHistory(number);
+					  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
+					  }
+				  }
+			  }
+		  }/*
 		  switch (flag)//detect what current flag is 
 		  {
 			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
@@ -544,7 +572,7 @@ public class MainActivity extends Activity
 			  default: 
 			  break;
 			  
-		  }
+		  }*/
 		  reset();//reset ready for a new calculation
 		  ans();
 		  displayNumber(answer);//update the display with the answer
