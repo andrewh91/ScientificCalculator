@@ -136,6 +136,22 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		button[7].setOnLongClickListener(new View.OnLongClickListener() //use root operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				openBracket();//open bracket operator
+				return true;
+			}
+		});
+		button[8].setOnLongClickListener(new View.OnLongClickListener() //use root operator
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				closeBracket();//close bracket operator
+				return true;
+			}
+		});
 		button[9].setOnLongClickListener(new View.OnLongClickListener() //use equals operator
 		{
 			@Override
@@ -241,8 +257,7 @@ public class MainActivity extends Activity
 			operator=' ';//clears operator from previous display
 			displayNumber(number);//updates the display
 			numberEntered = true;//record the fact that the most recent action was a number being entered
-			
-			//TODO need to set the operator flag of new numbers if required
+	
 	  }
 	  public void displayNumber(BigDecimal input)//updates the display, with supplied argument, could be current number or answer
 	  {
@@ -291,6 +306,7 @@ public class MainActivity extends Activity
 	  }
 	  void setOperatorFlag(operatorFlag newOperatorFlag)// a method to set the current number's flag to the operator being pressed
 	  {
+		  currentOperatorFlag=newOperatorFlag;
 		  objects.get(objects.size()-1).operator1= newOperatorFlag;
 	  }
 	  public void root()
@@ -298,10 +314,11 @@ public class MainActivity extends Activity
 		  addNumToHistory(number);//adds current number to memory
 		  operator='r';//sets the operator
 		  displayNumber(number);//updates the display with the operator
-		  if(flag.compareTo(operatorFlag.sqrt)<0)//if current flag is of less or equal BIDMAS importance...
+		  setOperatorFlag(operatorFlag.sqrt);
+		  /*if(flag.compareTo(operatorFlag.sqrt)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.sqrt;//...set flag to determine what "=" does when pressed	
-		  }
+		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 	  }
 	  public void power()//adds current number to memory, sets flag to power, so the equals method will raise the initial number to the power of the second in memory
@@ -309,16 +326,11 @@ public class MainActivity extends Activity
 		  addNumToHistory(number);//adds current number to memory
 		  operator='^';//sets the operator
 		  displayNumber(number);//updates the display with the operator
-		  //TODO
-		  objects.get(objects.size()-1).operator1=operatorFlag.power;
-		  //objects.get(objects.size()-1).bracketNo = currentBracket;//assign this when new object is created instead
-		  currentOperatorFlag=operatorFlag.power;
 		  setOperatorFlag(operatorFlag.power);
-		  
-		  if(flag.compareTo(operatorFlag.power)<0)//if current flag is of less or equal BIDMAS importance...
+		  /*if(flag.compareTo(operatorFlag.power)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.power;//...set flag to determine what "=" does when pressed	
-		  }
+		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 	  }
 	  public void divide()//adds current number to memory, sets flag to divide, so the equals method will divide the numbers in memory
@@ -326,10 +338,11 @@ public class MainActivity extends Activity
 		  addNumToHistory(number);//adds current number to memory
 		  operator='/';//sets the operator
 		  displayNumber(number);//updates the display with the operator
-		  if(flag.compareTo(operatorFlag.divide)<0)//if current flag is of less or equal BIDMAS importance...
+		  setOperatorFlag(operatorFlag.divide);
+		  /*if(flag.compareTo(operatorFlag.divide)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.divide;//...set flag to determine what "=" does when pressed	
-		  }
+		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 	  }
 	  public void multiply()//adds current number to memory, sets flag o multiply for equals method
@@ -337,10 +350,11 @@ public class MainActivity extends Activity
 		  addNumToHistory(number);//adds current number to memory
 		  operator = '*';//sets the operator
 		  displayNumber(number);//updates the display with the operator
-		  if(flag.compareTo(operatorFlag.multiply)<0)//if current flag is of less or equal BIDMAS importance...
+		  setOperatorFlag(operatorFlag.multiply);
+		  /*if(flag.compareTo(operatorFlag.multiply)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.multiply;//...set flag to determine what "=" does when pressed			  
-		  }
+		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 	  }
 	  public void plus()//adds current number to memory, sets flag to plus so that plus is called during equals method
@@ -348,16 +362,12 @@ public class MainActivity extends Activity
 		  addNumToHistory(number);//adds current number to memory
 		  displayNumber(number);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
 		  
-		  //TODO modify all operator methods to set flags on the number
-		  objects.get(objects.size()-1).operator1=operatorFlag.plus;
-		  //objects.get(objects.size()-1).bracketNo = currentBracket;//assign this when new object is created instead
-		  currentOperatorFlag=operatorFlag.plus;
 		  setOperatorFlag(operatorFlag.plus);
-		  
+		  /*
 		  if(flag.compareTo(operatorFlag.plus)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
 			  flag = operatorFlag.plus;//...set flag to determine what "=" does when pressed			  
-		  }
+		  }*/
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
 	  }
 	  public void subtract()//calls plus in case the intention is subtraction, also sets next number to negative sign
@@ -525,9 +535,13 @@ public class MainActivity extends Activity
 	  public void openBracket(){
 		  highestBracket++;
 		  currentBracket++;
+		  operator ='(';
+		  newNumberMode();
 	  }
 	  public void closeBracket(){
 		  currentBracket--;
+		  operator =')';
+		  newNumberMode();
 	  }
 	  public void equalsOp()//method which performs calculations
 	  {
@@ -538,14 +552,47 @@ public class MainActivity extends Activity
 			  {
 				  if(objects.get(j).bracketNo==i)
 				  {
-					  if (objects.get(j).operator1==operatorFlag.power)
+					  if(objects.get(j).operator1==operatorFlag.sqrt)
+					  {
+						  addNumToHistory(number);
+						  BigDecimal halfNumber = objects.get(objects.size()-1).number.divide(new BigDecimal(2),MathContext.DECIMAL64);//divide number by 2
+						  BigDecimal estimate = objects.get(objects.size()-1).number.divide(halfNumber,MathContext.DECIMAL64);//new estimate number to 
+						  BigDecimal average = (halfNumber.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//find average of half the number and the estimate
+						  for(int k=0;k<50;k++)
+						  {
+							  estimate=objects.get(objects.size()-1).number.divide(average,MathContext.DECIMAL64);//new estimate should equal the number divided by the previous average
+							  average=(average.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//average the current average and estimate
+						  }
+						  answer=average;//the more iterations we complete the closer we can approximate an answer.
+					  }
+					  else if (objects.get(j).operator1==operatorFlag.power)
 					  {
 						addNumToHistory(number);
 					  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
+					  	objects.get(j).number=answer;
+					  	objects.get(j).operator1=objects.get(j+1).operator2;
+					  	objects.remove(j+1);
 					  }
+					  else if (objects.get(j).operator1==operatorFlag.divide)
+					  {
+						addNumToHistory(number);
+					  	answer= objects.get(j).number.divide(objects.get(j+1).number,MathContext.DECIMAL64);
+					  }
+					  else if (objects.get(j).operator1==operatorFlag.multiply)
+					  {
+						addNumToHistory(number);
+					  	answer= objects.get(j).number.multiply(objects.get(j+1).number,MathContext.DECIMAL64);
+					  }
+					  else if (objects.get(j).operator1==operatorFlag.plus)
+					  {
+						addNumToHistory(number);
+					  	answer= objects.get(j).number.add(objects.get(j+1).number,MathContext.DECIMAL64);
+					  }
+					  
 				  }
 			  }
-		  }/*
+		  }
+		  /*
 		  switch (flag)//detect what current flag is 
 		  {
 			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
