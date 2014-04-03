@@ -543,14 +543,34 @@ public class MainActivity extends Activity
 		  operator =')';
 		  newNumberMode();
 	  }
+	  public boolean calculatePower(int j)
+	  {
+		  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
+		  	objects.get(j).number=answer;
+		  	objects.get(j).operator1=objects.get(j+1).operator2;
+		  	objects.remove(j+1);
+		  	if(objects.size()>2)
+		  	{
+		  		return true;
+		  		
+		  	}
+		  	else 
+		  	{
+		  		return false;
+		  	}
+	  }
 	  public void equalsOp()//method which performs calculations
 	  {
+		  
+		  int noOfNumbers=objects.size(); 
 		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
-		  for(int i=highestBracket;i>=0;i--)
+		  //for(int i=highestBracket;i>=0;i--)
+		 // while(objects.size()>1);
 		  {
-			  for(int j= 0;j<objects.size();j++)
+			  addNumToHistory(number);
+			  for(int j= 0;j<noOfNumbers;j++)
 			  {
-				  if(objects.get(j).bracketNo==i)
+				  //if(objects.get(j).bracketNo==i)
 				  {
 					  if(objects.get(j).operator1==operatorFlag.sqrt)
 					  {
@@ -567,7 +587,13 @@ public class MainActivity extends Activity
 					  }
 					  else if (objects.get(j).operator1==operatorFlag.power)
 					  {
-						addNumToHistory(number);
+						/*addNumToHistory(number);
+						if(calculatePower(j))
+						{
+							calculatePower(j);
+							j++;
+						}*/
+						
 					  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
 					  	objects.get(j).number=answer;
 					  	objects.get(j).operator1=objects.get(j+1).operator2;
@@ -583,12 +609,18 @@ public class MainActivity extends Activity
 						addNumToHistory(number);
 					  	answer= objects.get(j).number.multiply(objects.get(j+1).number,MathContext.DECIMAL64);
 					  }
-					  else if (objects.get(j).operator1==operatorFlag.plus)
+					  else if (objects.get(0).operator1==operatorFlag.plus)
 					  {
-						addNumToHistory(number);
-					  	answer= objects.get(j).number.add(objects.get(j+1).number,MathContext.DECIMAL64);
+					  	answer= objects.get(0).number.add(objects.get(1).number,MathContext.DECIMAL64);
+					  	objects.get(0).number=answer;
+					  	objects.get(0).operator1=objects.get(1).operator2;
+					  	objects.remove(1);
+					  	
 					  }
-					  
+					  else
+					  {
+						  
+					  }
 				  }
 			  }
 		  }
