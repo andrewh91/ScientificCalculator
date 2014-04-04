@@ -31,6 +31,7 @@ public class MainActivity extends Activity
 		operatorFlag operator1;
 		operatorFlag operator2;
 		int bracketNo;
+		boolean remove=false;
 		Objects(BigDecimal n ,operatorFlag f) 
 		{
 			number=n;
@@ -543,7 +544,7 @@ public class MainActivity extends Activity
 		  operator =')';
 		  newNumberMode();
 	  }
-	  public boolean calculatePower(int j)
+	 /* public boolean calculatePower(int j)
 	  {
 		  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
 		  	objects.get(j).number=answer;
@@ -558,15 +559,32 @@ public class MainActivity extends Activity
 		  	{
 		  		return false;
 		  	}
-	  }
+	  }*/
 	  public void equalsOp()//method which performs calculations
 	  {
-		  
+		  addNumToHistory(number);
 		  int noOfNumbers=objects.size(); 
+		  for(int i = 0;i<noOfNumbers;i++)
+		  {
+			  if(objects.get(i).operator1==operatorFlag.power)
+			  {
+				  	answer= objects.get(i).number.pow(objects.get(i+1).number.intValue(),MathContext.DECIMAL64);
+				  	objects.get(i+1).number=answer;
+				  	//objects.get(i).operator2=objects.get(i+1).operator2;
+				  	objects.get(i).remove=true;
+			  }
+		  }
+		  for(int j = 1;j<2;j++)
+		  {
+			  if(objects.get(j).remove)
+			  {
+				  objects.remove(j);
+			  }
+		  }
 		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
 		  //for(int i=highestBracket;i>=0;i--)
 		 // while(objects.size()>1);
-		  {
+		  /*{
 			  addNumToHistory(number);
 			  for(int j= 0;j<noOfNumbers;j++)
 			  {
@@ -592,7 +610,7 @@ public class MainActivity extends Activity
 						{
 							calculatePower(j);
 							j++;
-						}*/
+						}*//*
 						
 					  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
 					  	objects.get(j).number=answer;
@@ -623,7 +641,7 @@ public class MainActivity extends Activity
 					  }
 				  }
 			  }
-		  }
+		  }*/
 		  /*
 		  switch (flag)//detect what current flag is 
 		  {
