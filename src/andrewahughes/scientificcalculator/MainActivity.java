@@ -560,6 +560,16 @@ public class MainActivity extends Activity
 		  		return false;
 		  	}
 	  }*/
+	  public void removeNumber(int noOfNumbers)
+	  {
+		  for(int j = 2;j>1;j--)//figure out why this works but this doesn't //for(int j = objects.size();j>0;j--)
+		  {
+			  if(objects.get(j).remove)
+			  {
+				  objects.remove(j);
+			  }
+		  }
+	  }
 	  public void equalsOp()//method which performs calculations
 	  {
 		  addNumToHistory(number);
@@ -574,13 +584,51 @@ public class MainActivity extends Activity
 				  	objects.get(i).remove=true;
 			  }
 		  }
-		  for(int j = 1;j<2;j++)
+		  removeNumber(noOfNumbers);
+		  for(int i = 0;i<noOfNumbers;i++)
 		  {
-			  if(objects.get(j).remove)
+			  if(objects.get(i).operator1==operatorFlag.divide)
 			  {
-				  objects.remove(j);
+				  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
+				  	objects.get(i+1).number=answer;
+				  	//objects.get(i).operator2=objects.get(i+1).operator2;
+				  	objects.get(i).remove=true;
 			  }
 		  }
+		  removeNumber(noOfNumbers);
+		  for(int i = 0;i<noOfNumbers;i++)
+		  {
+			  if(objects.get(i).operator1==operatorFlag.multiply)
+			  {
+				  	answer= objects.get(i).number.multiply(objects.get(i+1).number,MathContext.DECIMAL64);
+				  	objects.get(i+1).number=answer;
+				  	//objects.get(i).operator2=objects.get(i+1).operator2;
+				  	objects.get(i).remove=true;
+			  }
+		  }
+		  removeNumber(noOfNumbers);
+		  for(int i = 0;i<noOfNumbers;i++)
+		  {
+			  if(objects.get(i).operator1==operatorFlag.plus)
+			  {
+				  	answer= objects.get(i).number.add(objects.get(i+1).number,MathContext.DECIMAL64);
+				  	objects.get(i+1).number=answer;
+				  	//objects.get(i).operator2=objects.get(i+1).operator2;
+				  	objects.get(i).remove=true;
+			  }
+		  }
+		  removeNumber(noOfNumbers);
+		  for(int i = 0;i<noOfNumbers;i++)
+		  {
+			  if(objects.get(i).operator1==operatorFlag.subtract)
+			  {
+				  	answer= objects.get(i).number.subtract(objects.get(i+1).number,MathContext.DECIMAL64);
+				  	objects.get(i+1).number=answer;
+				  	//objects.get(i).operator2=objects.get(i+1).operator2;
+				  	objects.get(i).remove=true;
+			  }
+		  }
+		  removeNumber(noOfNumbers);
 		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
 		  //for(int i=highestBracket;i>=0;i--)
 		 // while(objects.size()>1);
