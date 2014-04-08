@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends Activity 
@@ -41,7 +42,8 @@ public class MainActivity extends Activity
 			
 		}
 	}
-	List<Objects> objects =new ArrayList<Objects>();//used to store numbers and calculations in memory
+	//TODO might need to alter this
+	List<Objects> objects =new ArrayList<Objects>(5);//used to store numbers and calculations in memory
 	public boolean numberEntered = false;//fix bug where 0 was recorded as current number if you press two operators
 	
 	@Override
@@ -560,13 +562,16 @@ public class MainActivity extends Activity
 		  		return false;
 		  	}
 	  }*/
+	  //TODO fix this remove method
 	  public void removeNumber(int noOfNumbers)
 	  {
-		  for(int j = 2;j>1;j--)//figure out why this works but this doesn't //for(int j = objects.size();j>0;j--)
+		  Iterator<Objects> itr = objects.iterator();
+		  while(itr.hasNext())
 		  {
-			  if(objects.get(j).remove)
+			  if(itr.next().remove)
 			  {
-				  objects.remove(j);
+				  itr.remove();
+				  break;
 			  }
 		  }
 	  }
