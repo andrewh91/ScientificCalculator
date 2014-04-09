@@ -23,7 +23,7 @@ public class MainActivity extends Activity
 	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
 	public boolean inverse=false,hyperbolic=false;
 	double d;//used in trig
-	int currentBracket=0,highestBracket=0;
+	int currentBracket=0,highestBracket=0, noOfNumbers=0;
 	
 	public class Objects//used for history
 	{
@@ -563,22 +563,21 @@ public class MainActivity extends Activity
 		  	}
 	  }*/
 	  //TODO fix this remove method
-	  public void removeNumber(int noOfNumbers)
+	  public void removeNumber()
 	  {
-		  Iterator<Objects> itr = objects.iterator();
-		  while(itr.hasNext())
+		  for(Iterator<Objects> itr = objects.iterator();itr.hasNext();)
 		  {
 			  if(itr.next().remove)
 			  {
 				  itr.remove();
-				  break;
+				  noOfNumbers --;
 			  }
 		  }
 	  }
 	  public void equalsOp()//method which performs calculations
 	  {
 		  addNumToHistory(number);
-		  int noOfNumbers=objects.size(); 
+		  noOfNumbers=objects.size(); 
 		  for(int i = 0;i<noOfNumbers;i++)
 		  {
 			  if(objects.get(i).operator1==operatorFlag.power)
@@ -589,7 +588,7 @@ public class MainActivity extends Activity
 				  	objects.get(i).remove=true;
 			  }
 		  }
-		  removeNumber(noOfNumbers);
+		  removeNumber();
 		  for(int i = 0;i<noOfNumbers;i++)
 		  {
 			  if(objects.get(i).operator1==operatorFlag.divide)
@@ -600,7 +599,7 @@ public class MainActivity extends Activity
 				  	objects.get(i).remove=true;
 			  }
 		  }
-		  removeNumber(noOfNumbers);
+		  removeNumber();
 		  for(int i = 0;i<noOfNumbers;i++)
 		  {
 			  if(objects.get(i).operator1==operatorFlag.multiply)
@@ -611,7 +610,7 @@ public class MainActivity extends Activity
 				  	objects.get(i).remove=true;
 			  }
 		  }
-		  removeNumber(noOfNumbers);
+		  removeNumber();
 		  for(int i = 0;i<noOfNumbers;i++)
 		  {
 			  if(objects.get(i).operator1==operatorFlag.plus)
@@ -622,7 +621,7 @@ public class MainActivity extends Activity
 				  	objects.get(i).remove=true;
 			  }
 		  }
-		  removeNumber(noOfNumbers);
+		  removeNumber();
 		  for(int i = 0;i<noOfNumbers;i++)
 		  {
 			  if(objects.get(i).operator1==operatorFlag.subtract)
@@ -633,7 +632,7 @@ public class MainActivity extends Activity
 				  	objects.get(i).remove=true;
 			  }
 		  }
-		  removeNumber(noOfNumbers);
+		  removeNumber();
 		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
 		  //for(int i=highestBracket;i>=0;i--)
 		 // while(objects.size()>1);
