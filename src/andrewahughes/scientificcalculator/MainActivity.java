@@ -95,6 +95,10 @@ public class MainActivity extends Activity
 			public boolean onLongClick(View v) {
 				subtract=new BigDecimal(1);//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
 				operator ='+';//appends operator here because subtract shares a method with plus, and putting this in the method would overwrite the - 
+
+				  addNumToHistory(number);//adds current number to memory
+				  
+				  setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
 				plus();//plus operator
 				return true;
 			}
@@ -362,10 +366,7 @@ public class MainActivity extends Activity
 	  }
 	  public void plus()//adds current number to memory, sets flag to plus so that plus is called during equals method
 	  {
-		  addNumToHistory(number);//adds current number to memory
 		  displayNumber(number);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
-		  
-		  setOperatorFlag(operatorFlag.plus);
 		  /*
 		  if(flag.compareTo(operatorFlag.plus)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
@@ -377,6 +378,10 @@ public class MainActivity extends Activity
 	  {
 		  operator ='-';//appends - operator to confirm button was pressed
 		  plus();//call plus because subtraction is the same a addition but with negative numbers
+		  if(objects.get(objects.size()-1).operator1==operatorFlag.none)//if we use an operator in conjunction with...  
+		  {																//...negative numbers, the minus replaces the operator flag...
+			  objects.get(objects.size()-1).operator1= operatorFlag.plus;//...this makes sure we only change the flag if the flag  wasn't already set
+		  }
 		  subtract = new BigDecimal(-1);//this sets the subtract variable which affects the appendNumber method
 	  }
 	  public void backSpace()//undoes the last number entered
@@ -546,22 +551,6 @@ public class MainActivity extends Activity
 		  operator =')';
 		  newNumberMode();
 	  }
-	 /* public boolean calculatePower(int j)
-	  {
-		  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
-		  	objects.get(j).number=answer;
-		  	objects.get(j).operator1=objects.get(j+1).operator2;
-		  	objects.remove(j+1);
-		  	if(objects.size()>2)
-		  	{
-		  		return true;
-		  		
-		  	}
-		  	else 
-		  	{
-		  		return false;
-		  	}
-	  }*/
 	  //TODO fix this remove method
 	  public void removeNumber()
 	  {
@@ -578,152 +567,65 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);
 		  noOfNumbers=objects.size(); 
-		  for(int i = 0;i<noOfNumbers;i++)
+		  for(int j=highestBracket;j>0;j--)
 		  {
-			  if(objects.get(i).operator1==operatorFlag.power)
+			  for(int i = 0;i<noOfNumbers;i++)
 			  {
-				  	answer= objects.get(i).number.pow(objects.get(i+1).number.intValue(),MathContext.DECIMAL64);
-				  	objects.get(i+1).number=answer;
-				  	//objects.get(i).operator2=objects.get(i+1).operator2;
-				  	objects.get(i).remove=true;
-			  }
-		  }
-		  removeNumber();
-		  for(int i = 0;i<noOfNumbers;i++)
-		  {
-			  if(objects.get(i).operator1==operatorFlag.divide)
-			  {
-				  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
-				  	objects.get(i+1).number=answer;
-				  	//objects.get(i).operator2=objects.get(i+1).operator2;
-				  	objects.get(i).remove=true;
-			  }
-		  }
-		  removeNumber();
-		  for(int i = 0;i<noOfNumbers;i++)
-		  {
-			  if(objects.get(i).operator1==operatorFlag.multiply)
-			  {
-				  	answer= objects.get(i).number.multiply(objects.get(i+1).number,MathContext.DECIMAL64);
-				  	objects.get(i+1).number=answer;
-				  	//objects.get(i).operator2=objects.get(i+1).operator2;
-				  	objects.get(i).remove=true;
-			  }
-		  }
-		  removeNumber();
-		  for(int i = 0;i<noOfNumbers;i++)
-		  {
-			  if(objects.get(i).operator1==operatorFlag.plus)
-			  {
-				  	answer= objects.get(i).number.add(objects.get(i+1).number,MathContext.DECIMAL64);
-				  	objects.get(i+1).number=answer;
-				  	//objects.get(i).operator2=objects.get(i+1).operator2;
-				  	objects.get(i).remove=true;
-			  }
-		  }
-		  removeNumber();
-		  for(int i = 0;i<noOfNumbers;i++)
-		  {
-			  if(objects.get(i).operator1==operatorFlag.subtract)
-			  {
-				  	answer= objects.get(i).number.subtract(objects.get(i+1).number,MathContext.DECIMAL64);
-				  	objects.get(i+1).number=answer;
-				  	//objects.get(i).operator2=objects.get(i+1).operator2;
-				  	objects.get(i).remove=true;
-			  }
-		  }
-		  removeNumber();
-		  //TODO need to write a new equals loop that calculates long equations in order of bidmas
-		  //for(int i=highestBracket;i>=0;i--)
-		 // while(objects.size()>1);
-		  /*{
-			  addNumToHistory(number);
-			  for(int j= 0;j<noOfNumbers;j++)
-			  {
-				  //if(objects.get(j).bracketNo==i)
+				  if(objects.get(i).operator1==operatorFlag.power&&objects.get(i).bracketNo==j)
 				  {
-					  if(objects.get(j).operator1==operatorFlag.sqrt)
-					  {
-						  addNumToHistory(number);
-						  BigDecimal halfNumber = objects.get(objects.size()-1).number.divide(new BigDecimal(2),MathContext.DECIMAL64);//divide number by 2
-						  BigDecimal estimate = objects.get(objects.size()-1).number.divide(halfNumber,MathContext.DECIMAL64);//new estimate number to 
-						  BigDecimal average = (halfNumber.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//find average of half the number and the estimate
-						  for(int k=0;k<50;k++)
-						  {
-							  estimate=objects.get(objects.size()-1).number.divide(average,MathContext.DECIMAL64);//new estimate should equal the number divided by the previous average
-							  average=(average.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//average the current average and estimate
-						  }
-						  answer=average;//the more iterations we complete the closer we can approximate an answer.
-					  }
-					  else if (objects.get(j).operator1==operatorFlag.power)
-					  {
-						/*addNumToHistory(number);
-						if(calculatePower(j))
-						{
-							calculatePower(j);
-							j++;
-						}*//*
-						
-					  	answer= objects.get(j).number.pow(objects.get(j+1).number.intValue(),MathContext.DECIMAL64);
-					  	objects.get(j).number=answer;
-					  	objects.get(j).operator1=objects.get(j+1).operator2;
-					  	objects.remove(j+1);
-					  }
-					  else if (objects.get(j).operator1==operatorFlag.divide)
-					  {
-						addNumToHistory(number);
-					  	answer= objects.get(j).number.divide(objects.get(j+1).number,MathContext.DECIMAL64);
-					  }
-					  else if (objects.get(j).operator1==operatorFlag.multiply)
-					  {
-						addNumToHistory(number);
-					  	answer= objects.get(j).number.multiply(objects.get(j+1).number,MathContext.DECIMAL64);
-					  }
-					  else if (objects.get(0).operator1==operatorFlag.plus)
-					  {
-					  	answer= objects.get(0).number.add(objects.get(1).number,MathContext.DECIMAL64);
-					  	objects.get(0).number=answer;
-					  	objects.get(0).operator1=objects.get(1).operator2;
-					  	objects.remove(1);
-					  	
-					  }
-					  else
-					  {
-						  
-					  }
+					  	answer= objects.get(i).number.pow(objects.get(i+1).number.intValue(),MathContext.DECIMAL64);
+					  	objects.get(i+1).number=answer;
+					  	//objects.get(i).operator2=objects.get(i+1).operator2;
+					  	objects.get(i).remove=true;
 				  }
 			  }
-		  }*/
-		  /*
-		  switch (flag)//detect what current flag is 
-		  {
-			  case none: ;//if none, no calculation has been pressed, = has probably been pressed in error
-			  break;//break the statement, no need to carry on as the following cases can not be true
-			  case sqrt:  
-			  BigDecimal halfNumber = objects.get(objects.size()-1).number.divide(new BigDecimal(2),MathContext.DECIMAL64);//divide number by 2
-			  BigDecimal estimate = objects.get(objects.size()-1).number.divide(halfNumber,MathContext.DECIMAL64);//new estimate number to 
-			  BigDecimal average = (halfNumber.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//find average of half the number and the estimate
-			  for(int i=0;i<50;i++)
+			  removeNumber();
+			  for(int i = 0;i<noOfNumbers;i++)
 			  {
-				  estimate=objects.get(objects.size()-1).number.divide(average,MathContext.DECIMAL64);//new estimate should equal the number divided by the previous average
-				  average=(average.add(estimate)).divide(new BigDecimal(2),MathContext.DECIMAL64);//average the current average and estimate
+				  if(objects.get(i).operator1==operatorFlag.divide)
+				  {
+					  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
+					  	objects.get(i+1).number=answer;
+					  	//objects.get(i).operator2=objects.get(i+1).operator2;
+					  	objects.get(i).remove=true;
+				  }
 			  }
-			  answer=average;//the more iterations we complete the closer we can approximate an answer.
-			  break;//add current number to history, raise the 1st number entered to last number entered 
-			  case power: addNumToHistory(number); answer = objects.get(objects.size()-2).number.pow(objects.get(objects.size()-1).number.intValue(),MathContext.DECIMAL64);
-			  break;//add current number to history, raise the 1st number entered to last number entered 
-			  case divide: addNumToHistory(number); answer = objects.get(objects.size()-2).number.divide(objects.get(objects.size()-1).number,MathContext.DECIMAL64);
-			  break;//add current number to history, divide the 2nd to last number entered by the last number entered
-			  case multiply: addNumToHistory(number); answer = objects.get(objects.size()-2).number.multiply(objects.get(objects.size()-1).number);
-			  break;//add current number to history, multiply the 2nd to last number entered with the last number entered
-			  case plus: addNumToHistory(number); answer = objects.get(objects.size()-2).number.add(objects.get(objects.size()-1).number); 
-			  break;//add current number to history, add the 2nd to last number entered with the last number entered
-			  default: 
-			  break;
-			  
-		  }*/
+			  removeNumber();
+			  for(int i = 0;i<noOfNumbers;i++)
+			  {
+				  if(objects.get(i).operator1==operatorFlag.multiply)
+				  {
+					  	answer= objects.get(i).number.multiply(objects.get(i+1).number,MathContext.DECIMAL64);
+					  	objects.get(i+1).number=answer;
+					  	//objects.get(i).operator2=objects.get(i+1).operator2;
+					  	objects.get(i).remove=true;
+				  }
+			  }
+			  removeNumber();
+			  for(int i = 0;i<noOfNumbers;i++)
+			  {
+				  if(objects.get(i).operator1==operatorFlag.plus)
+				  {
+					  	answer= objects.get(i).number.add(objects.get(i+1).number,MathContext.DECIMAL64);
+					  	objects.get(i+1).number=answer;
+					  	//objects.get(i).operator2=objects.get(i+1).operator2;
+					  	objects.get(i).remove=true;
+				  }
+			  }
+			  removeNumber();
+			  for(int i = 0;i<noOfNumbers;i++)
+			  {
+				  if(objects.get(i).operator1==operatorFlag.subtract)
+				  {
+					  	answer= objects.get(i).number.subtract(objects.get(i+1).number,MathContext.DECIMAL64);
+					  	objects.get(i+1).number=answer;
+					  	//objects.get(i).operator2=objects.get(i+1).operator2;
+					  	objects.get(i).remove=true;
+				  }
+			  }
+			  removeNumber();
+		  }
 		  reset();//reset ready for a new calculation
-		  ans();
 		  displayNumber(answer);//update the display with the answer
 	  }
 }
