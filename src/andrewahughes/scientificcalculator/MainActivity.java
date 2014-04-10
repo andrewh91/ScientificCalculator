@@ -315,6 +315,7 @@ public class MainActivity extends Activity
 	  {
 		  currentOperatorFlag=newOperatorFlag;
 		  objects.get(objects.size()-1).operator1= newOperatorFlag;
+		  objects.get(objects.size()-1).bracketNo=currentBracket;
 	  }
 	  public void root()
 	  {
@@ -544,14 +545,14 @@ public class MainActivity extends Activity
 		  highestBracket++;
 		  currentBracket++;
 		  operator ='(';
-		  newNumberMode();
+		  displayNumber(number);
+		 
 	  }
 	  public void closeBracket(){
 		  currentBracket--;
 		  operator =')';
-		  newNumberMode();
+		  displayNumber(number);
 	  }
-	  //TODO fix this remove method
 	  public void removeNumber()
 	  {
 		  for(Iterator<Objects> itr = objects.iterator();itr.hasNext();)
@@ -566,8 +567,9 @@ public class MainActivity extends Activity
 	  public void equalsOp()//method which performs calculations
 	  {
 		  addNumToHistory(number);
+		  //TODO brackets
 		  noOfNumbers=objects.size(); 
-		  for(int j=highestBracket;j>0;j--)
+		  for(int j=highestBracket;j>=0;j--)
 		  {
 			  for(int i = 0;i<noOfNumbers;i++)
 			  {
@@ -582,7 +584,7 @@ public class MainActivity extends Activity
 			  removeNumber();
 			  for(int i = 0;i<noOfNumbers;i++)
 			  {
-				  if(objects.get(i).operator1==operatorFlag.divide)
+				  if(objects.get(i).operator1==operatorFlag.divide&&objects.get(i).bracketNo==j)
 				  {
 					  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
 					  	objects.get(i+1).number=answer;
@@ -593,7 +595,7 @@ public class MainActivity extends Activity
 			  removeNumber();
 			  for(int i = 0;i<noOfNumbers;i++)
 			  {
-				  if(objects.get(i).operator1==operatorFlag.multiply)
+				  if(objects.get(i).operator1==operatorFlag.multiply&&objects.get(i).bracketNo==j)
 				  {
 					  	answer= objects.get(i).number.multiply(objects.get(i+1).number,MathContext.DECIMAL64);
 					  	objects.get(i+1).number=answer;
@@ -604,7 +606,7 @@ public class MainActivity extends Activity
 			  removeNumber();
 			  for(int i = 0;i<noOfNumbers;i++)
 			  {
-				  if(objects.get(i).operator1==operatorFlag.plus)
+				  if(objects.get(i).operator1==operatorFlag.plus&&objects.get(i).bracketNo==j)
 				  {
 					  	answer= objects.get(i).number.add(objects.get(i+1).number,MathContext.DECIMAL64);
 					  	objects.get(i+1).number=answer;
@@ -613,6 +615,7 @@ public class MainActivity extends Activity
 				  }
 			  }
 			  removeNumber();
+			  /*//method not used
 			  for(int i = 0;i<noOfNumbers;i++)
 			  {
 				  if(objects.get(i).operator1==operatorFlag.subtract)
@@ -624,6 +627,7 @@ public class MainActivity extends Activity
 				  }
 			  }
 			  removeNumber();
+			  */
 		  }
 		  reset();//reset ready for a new calculation
 		  displayNumber(answer);//update the display with the answer
