@@ -18,7 +18,7 @@ public class MainActivity extends Activity
 	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,sqrt,bracket};//enumerators for BIDMAS order
 	public operatorFlag flag=operatorFlag.none; //initialise
 	public operatorFlag currentOperatorFlag= operatorFlag.none;//used to set operator flag of number as soon as you enter it
-	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1),memoryStore=new BigDecimal(0);
+	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),memoryStore=new BigDecimal(0);
 	public byte decimal=0,integer=1,digitNo=0; 
 	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
 	public boolean inverse=false,hyperbolic=false;
@@ -88,7 +88,6 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
-				subtract=new BigDecimal(1);//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
 				operator ='+';//appends operator here because subtract shares a method with plus, and putting this in the method would overwrite the - 
 				addNumToHistory(number);//adds current number to memory
 				setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
@@ -254,7 +253,7 @@ public class MainActivity extends Activity
 	}
 	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
 	  {	//the following calculation appends positive and negative, integer and decimal numbers as they are entered 
-			number=(number.multiply(BigDecimal.TEN.pow(integer))).add((input.multiply(subtract)).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
+			number=(number.multiply(BigDecimal.TEN.pow(integer))).add((input).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
 			digitNo= (byte) (digitNo+(1*decimal));//keeps track of decimal places etc
 			operator=' ';//clears operator from previous display
 			displayNumber(number);//updates the display
@@ -290,7 +289,6 @@ public class MainActivity extends Activity
 	  {
 		  integerMode();
 		  number = new BigDecimal(0); //resets the value of the number entered
-		  subtract = new BigDecimal(1);//resets the sign of the next number
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
@@ -499,7 +497,7 @@ public class MainActivity extends Activity
 	  }
 	  public void pi()
 	  {
-		  number = subtract.multiply(new BigDecimal(Math.PI));//equate the current number to PI, or minus PI
+		  number = (new BigDecimal(Math.PI));//equate the current number to PI
 		  answer=number;//sets answer to number so we can use ans button to carry on calculation
 		  displayNumber(number);//update display
 		  numberEntered=true;
@@ -520,7 +518,7 @@ public class MainActivity extends Activity
 	  }
 	  public void ans()//answer button, sets current number to last answer
 	  {
-		  number = answer.multiply(subtract);//simply add current number to previous answer
+		  number = answer;//simply add current number to previous answer
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
@@ -535,7 +533,7 @@ public class MainActivity extends Activity
 	  }
 	  public void mr()//memory recall button, sets current number to stored number
 	  {
-		  number = memoryStore.multiply(subtract);//set current number to stored variable
+		  number = memoryStore;//set current number to stored variable
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
