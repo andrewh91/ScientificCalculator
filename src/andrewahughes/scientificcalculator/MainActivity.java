@@ -117,7 +117,7 @@ public class MainActivity extends Activity
 			@Override
 			public boolean onLongClick(View v) {
 				addNumToHistory(number);//adds current number to memory
-				setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
+				setOperatorFlag(operatorFlag.plus);//
 				subtract();//subtract operator
 				return true;
 			}
@@ -378,7 +378,10 @@ public class MainActivity extends Activity
 		  {																//...negative numbers, the minus replaces the operator flag...
 			  objects.get(objects.size()-1).operator1= operatorFlag.plus;//...this makes sure we only change the flag if the flag  wasn't already set
 		  }
-		  subtract = new BigDecimal(-1);//this sets the subtract variable which affects the appendNumber method
+		  //subtract = new BigDecimal(-1);//this sets the subtract variable which affects the appendNumber method
+		  numberEntered=true;
+		  addNumToHistory(new BigDecimal(-1));
+		  objects.get(objects.size()-1).operator1= operatorFlag.multiply;
 	  }
 	  public void backSpace()//undoes the last number entered
 	  {
