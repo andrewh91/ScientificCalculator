@@ -25,25 +25,20 @@ public class MainActivity extends Activity
 	double d;//used in trig
 	int currentBracket=0,highestBracket=0, noOfNumbers=0;
 	
-	public class Objects//used for history
+	public class Objects//used for storing numbers, and their properties
 	{
 		BigDecimal number;
-		operatorFlag flag;
 		operatorFlag operator1;
-		operatorFlag operator2;
 		int bracketNo;
 		boolean remove=false;
-		Objects(BigDecimal n ,operatorFlag f) 
+		Objects(BigDecimal n) 
 		{
 			number=n;
-			flag=f;
-			operator2= f;
 			bracketNo= currentBracket;
 			
 		}
 	}
-	//TODO might need to alter this
-	List<Objects> objects =new ArrayList<Objects>(5);//used to store numbers and calculations in memory
+	List<Objects> objects =new ArrayList<Objects>();//used to store numbers and calculations in memory
 	public boolean numberEntered = false;//fix bug where 0 was recorded as current number if you press two operators
 	
 	@Override
@@ -95,10 +90,8 @@ public class MainActivity extends Activity
 			public boolean onLongClick(View v) {
 				subtract=new BigDecimal(1);//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
 				operator ='+';//appends operator here because subtract shares a method with plus, and putting this in the method would overwrite the - 
-
-				  addNumToHistory(number);//adds current number to memory
-				  
-				  setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
+				addNumToHistory(number);//adds current number to memory
+				setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
 				plus();//plus operator
 				return true;
 			}
@@ -123,6 +116,8 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
+				addNumToHistory(number);//adds current number to memory
+				setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
 				subtract();//subtract operator
 				return true;
 			}
@@ -307,7 +302,7 @@ public class MainActivity extends Activity
 	  {
 		  if(numberEntered)	//if the last thing entered is a number i.e. not an operator
 		  {
-			  objects.add(new Objects(number,currentOperatorFlag));//add the current number to a list, with the current operator flag as one of it's flags
+			  objects.add(new Objects(number));//add the current number to a list, with the current operator flag as one of it's flags
 		  }
 		  numberEntered=false;
 	  }
@@ -615,19 +610,7 @@ public class MainActivity extends Activity
 				  }
 			  }
 			  removeNumber();
-			  /*//method not used
-			  for(int i = 0;i<noOfNumbers;i++)
-			  {
-				  if(objects.get(i).operator1==operatorFlag.subtract)
-				  {
-					  	answer= objects.get(i).number.subtract(objects.get(i+1).number,MathContext.DECIMAL64);
-					  	objects.get(i+1).number=answer;
-					  	//objects.get(i).operator2=objects.get(i+1).operator2;
-					  	objects.get(i).remove=true;
-				  }
-			  }
-			  removeNumber();
-			  */
+
 		  }
 		  reset();//reset ready for a new calculation
 		  displayNumber(answer);//update the display with the answer
