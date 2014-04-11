@@ -15,15 +15,13 @@ import java.util.List;
 
 public class MainActivity extends Activity 
 {
-	public enum operatorFlag{none,subtract,plus,divide,multiply,squareRoot,power,sqrt,bracket};//enumerators for BIDMAS order
-	public operatorFlag flag=operatorFlag.none; //initialise
-	public operatorFlag currentOperatorFlag= operatorFlag.none;//used to set operator flag of number as soon as you enter it
-	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0),subtract = new BigDecimal(1),memoryStore=new BigDecimal(0);
+	public enum operatorFlag{none,plus,multiply,divide,power,sqrt};//enumerators for BIDMAS order
+	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0), ans=new BigDecimal(0),subtract =new BigDecimal(1), memoryStore=new BigDecimal(0);
 	public byte decimal=0,integer=1,digitNo=0; 
 	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
 	public boolean inverse=false,hyperbolic=false;
 	double d;//used in trig
-	int currentBracket=0,highestBracket=0, noOfNumbers=0;
+	int currentBracket=0,highestBracket=0, noOfNumbers=0,noOfPower=0,noOfDivide=0,noOfMultiply=0,noOfPlus=0;
 	
 	public class Objects//used for storing numbers, and their properties
 	{
@@ -88,7 +86,6 @@ public class MainActivity extends Activity
 		{
 			@Override
 			public boolean onLongClick(View v) {
-				subtract=new BigDecimal(1);//resets subtract, need in case we add or subtract multiple numbers in a row, e.g. 1-2+3+4=
 				operator ='+';//appends operator here because subtract shares a method with plus, and putting this in the method would overwrite the - 
 				addNumToHistory(number);//adds current number to memory
 				setOperatorFlag(operatorFlag.plus);//set flag here, because subtract uses the same method but different code involving the flag
@@ -112,12 +109,12 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
-		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator
+		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator//TODO
 		{
 			@Override
 			public boolean onLongClick(View v) {
 				addNumToHistory(number);//adds current number to memory
-				setOperatorFlag(operatorFlag.plus);//
+				//setOperatorFlag(operatorFlag.plus);//
 				subtract();//subtract operator
 				return true;
 			}
@@ -254,7 +251,7 @@ public class MainActivity extends Activity
 	}
 	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
 	  {	//the following calculation appends positive and negative, integer and decimal numbers as they are entered 
-			number=(number.multiply(BigDecimal.TEN.pow(integer))).add((input.multiply(subtract)).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
+			number=(number.multiply(BigDecimal.TEN.pow(integer))).add(subtract.multiply(input).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
 			digitNo= (byte) (digitNo+(1*decimal));//keeps track of decimal places etc
 			operator=' ';//clears operator from previous display
 			displayNumber(number);//updates the display
@@ -268,7 +265,7 @@ public class MainActivity extends Activity
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
-		  if(flag.compareTo(operatorFlag.power)!=0)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
+		  if(objects.get(-1).operator1.compareTo(operatorFlag.power)!=0)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
 		  {
 			  decimal=1;//sets values used in appendNumber method
 			  integer=0;
@@ -285,18 +282,17 @@ public class MainActivity extends Activity
 		  hyperbolic=false;
 		  hyperbolicChar=' ';
 		  inverseChar=' ';
+		  subtract = new BigDecimal(1);
 	  }
 	  public void newNumberMode()//set number entry mode to integer, set some other defaults too
 	  {
 		  integerMode();
 		  number = new BigDecimal(0); //resets the value of the number entered
-		  subtract = new BigDecimal(1);//resets the sign of the next number
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
 		  newNumberMode();//sets defaults to prepare for a new number,  
 		  operator = ' ';//resets the operator symbol
-		  flag = operatorFlag.none;//resets the operator flag, ready for a new calculation 
 	  }
 	  public void addNumToHistory(BigDecimal number)//adds current number to history list
 	  {
@@ -308,7 +304,6 @@ public class MainActivity extends Activity
 	  }
 	  void setOperatorFlag(operatorFlag newOperatorFlag)// a method to set the current number's flag to the operator being pressed
 	  {
-		  currentOperatorFlag=newOperatorFlag;
 		  objects.get(objects.size()-1).operator1= newOperatorFlag;
 		  objects.get(objects.size()-1).bracketNo=currentBracket;
 	  }
@@ -330,11 +325,8 @@ public class MainActivity extends Activity
 		  operator='^';//sets the operator
 		  displayNumber(number);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.power);
-		  /*if(flag.compareTo(operatorFlag.power)<0)//if current flag is of less or equal BIDMAS importance...
-		  {
-			  flag = operatorFlag.power;//...set flag to determine what "=" does when pressed	
-		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
+		  noOfPower++;//increment power counter to keep track of whether we've used powers and how many
 	  }
 	  public void divide()//adds current number to memory, sets flag to divide, so the equals method will divide the numbers in memory
 	  {
@@ -342,11 +334,8 @@ public class MainActivity extends Activity
 		  operator='/';//sets the operator
 		  displayNumber(number);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.divide);
-		  /*if(flag.compareTo(operatorFlag.divide)<0)//if current flag is of less or equal BIDMAS importance...
-		  {
-			  flag = operatorFlag.divide;//...set flag to determine what "=" does when pressed	
-		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
+		  noOfDivide++;//increment divide counter to keep track of whether we've used divides and how many
 	  }
 	  public void multiply()//adds current number to memory, sets flag o multiply for equals method
 	  {
@@ -354,34 +343,37 @@ public class MainActivity extends Activity
 		  operator = '*';//sets the operator
 		  displayNumber(number);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.multiply);
-		  /*if(flag.compareTo(operatorFlag.multiply)<0)//if current flag is of less or equal BIDMAS importance...
-		  {
-			  flag = operatorFlag.multiply;//...set flag to determine what "=" does when pressed			  
-		  }*/
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
+		  noOfMultiply++;//increment multply counter to keep track of whether we've used multiplies and how many
 	  }
 	  public void plus()//adds current number to memory, sets flag to plus so that plus is called during equals method
 	  {
 		  displayNumber(number);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
-		  /*
-		  if(flag.compareTo(operatorFlag.plus)<0)//if current flag is of less or equal BIDMAS importance...
-		  {
-			  flag = operatorFlag.plus;//...set flag to determine what "=" does when pressed			  
-		  }*/
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
+		  noOfPlus++;//increment plus counter to keep track of whether we've used pluses and how many
 	  }
+	  //TODO
 	  public void subtract()//calls plus in case the intention is subtraction, also sets next number to negative sign
 	  {
 		  operator ='-';//appends - operator to confirm button was pressed
-		  plus();//call plus because subtraction is the same a addition but with negative numbers
-		  if(objects.get(objects.size()-1).operator1==operatorFlag.none)//if we use an operator in conjunction with...  
-		  {																//...negative numbers, the minus replaces the operator flag...
-			  objects.get(objects.size()-1).operator1= operatorFlag.plus;//...this makes sure we only change the flag if the flag  wasn't already set
+		  if(objects.get(objects.size()-1).operator1==operatorFlag.power||objects.get(objects.size()-1).operator1==operatorFlag.divide)//in the special case that the number that we..
+		  {												//...want to be negative is the power, set it to negative now 
+			  subtract=(new BigDecimal(-1));
+			  displayNumber(number);
 		  }
-		  //subtract = new BigDecimal(-1);//this sets the subtract variable which affects the appendNumber method
-		  numberEntered=true;
-		  addNumToHistory(new BigDecimal(-1));
-		  objects.get(objects.size()-1).operator1= operatorFlag.multiply;
+		  else 
+		  {
+			  if(objects.get(objects.size()-1).operator1==operatorFlag.none)
+			  {
+				  plus();//call plus because subtraction is the same as addition but with negative numbers
+				  objects.get(objects.size()-1).operator1=operatorFlag.plus;
+			  }
+			  numberEntered=true;
+			  displayNumber(number);
+			  addNumToHistory(new BigDecimal(-1));
+			  objects.get(objects.size()-1).operator1= operatorFlag.multiply;//increment multiply counter to keep track of whether we've used multiplies and how many
+			  noOfMultiply++;
+		  }
 	  }
 	  public void backSpace()//undoes the last number entered
 	  {
@@ -403,7 +395,6 @@ public class MainActivity extends Activity
 		  newNumberMode();//prepare for  new number to be entered
 		  operator = ' ';//resets the operator symbol
 		  displayNumber(number);//updates display
-		  flag =operatorFlag.none;//resets operator flag ready for a new calculation 
 	  }
 	  public void sin()//uses the sin, arcsin or sinh trig function according to the value of the inverse and hyperbolic flags
 	  {
@@ -499,7 +490,7 @@ public class MainActivity extends Activity
 	  }
 	  public void pi()
 	  {
-		  number = subtract.multiply(new BigDecimal(Math.PI));//equate the current number to PI, or minus PI
+		  number = subtract.multiply((new BigDecimal(Math.PI)));//equate the current number to PI
 		  answer=number;//sets answer to number so we can use ans button to carry on calculation
 		  displayNumber(number);//update display
 		  numberEntered=true;
@@ -520,7 +511,7 @@ public class MainActivity extends Activity
 	  }
 	  public void ans()//answer button, sets current number to last answer
 	  {
-		  number = answer.multiply(subtract);//simply add current number to previous answer
+		  number = ans;//simply add current number to previous answer
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
@@ -535,7 +526,7 @@ public class MainActivity extends Activity
 	  }
 	  public void mr()//memory recall button, sets current number to stored number
 	  {
-		  number = memoryStore.multiply(subtract);//set current number to stored variable
+		  number = memoryStore;//set current number to stored variable
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
@@ -569,53 +560,70 @@ public class MainActivity extends Activity
 		  noOfNumbers=objects.size(); 
 		  for(int j=highestBracket;j>=0;j--)
 		  {
-			  for(int i = 0;i<noOfNumbers;i++)
+			  if(noOfPower>0)//if we've actually used powers...
 			  {
-				  if(objects.get(i).operator1==operatorFlag.power&&objects.get(i).bracketNo==j)
+				  for(int i = 0;i<noOfNumbers;i++)//...for each number...
 				  {
-					  	answer= objects.get(i).number.pow(objects.get(i+1).number.intValue(),MathContext.DECIMAL64);
-					  	objects.get(i+1).number=answer;
-					  	//objects.get(i).operator2=objects.get(i+1).operator2;
-					  	objects.get(i).remove=true;
+					  if(objects.get(i).operator1==operatorFlag.power&&objects.get(i).bracketNo==j)//..if it uses power...
+					  {														//...and is currently the deepest bracket...
+						  	answer= objects.get(i).number.pow(objects.get(i+1).number.intValue(),MathContext.DECIMAL64);
+						  	objects.get(i+1).number=answer;//...calculate power
+						  	objects.get(i).remove=true;
+						  	noOfPower--;//decrement power counter
+					  }
 				  }
-			  }
 			  removeNumber();
-			  for(int i = 0;i<noOfNumbers;i++)
+			  }
+			  if(noOfDivide>0)//if we've actually used divide...
 			  {
-				  if(objects.get(i).operator1==operatorFlag.divide&&objects.get(i).bracketNo==j)
+				  for(int i = 0;i<noOfNumbers;i++)
 				  {
-					  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
-					  	objects.get(i+1).number=answer;
-					  	//objects.get(i).operator2=objects.get(i+1).operator2;
-					  	objects.get(i).remove=true;
+					  if(objects.get(i).operator1==operatorFlag.divide&&objects.get(i).bracketNo==j)
+					  {
+						  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
+						  	objects.get(i+1).number=answer;
+						  	//objects.get(i).operator2=objects.get(i+1).operator2;
+						  	objects.get(i).remove=true;
+						  	noOfDivide--;
+					  }
 				  }
-			  }
 			  removeNumber();
-			  for(int i = 0;i<noOfNumbers;i++)
+			  }
+			  if(noOfMultiply>0)//if we've actually used multiply...
 			  {
-				  if(objects.get(i).operator1==operatorFlag.multiply&&objects.get(i).bracketNo==j)
+				  for(int i = 0;i<noOfNumbers;i++)
 				  {
-					  	answer= objects.get(i).number.multiply(objects.get(i+1).number,MathContext.DECIMAL64);
-					  	objects.get(i+1).number=answer;
-					  	//objects.get(i).operator2=objects.get(i+1).operator2;
-					  	objects.get(i).remove=true;
+					  if(objects.get(i).operator1==operatorFlag.multiply&&objects.get(i).bracketNo==j)
+					  {
+						  	answer= objects.get(i).number.multiply(objects.get(i+1).number,MathContext.DECIMAL64);
+						  	objects.get(i+1).number=answer;
+						  	//objects.get(i).operator2=objects.get(i+1).operator2;
+						  	objects.get(i).remove=true;
+						  	noOfMultiply--;
+					  }
 				  }
-			  }
 			  removeNumber();
-			  for(int i = 0;i<noOfNumbers;i++)
+			  }
+			  if(noOfPlus>0)//if we've actually used plus...
 			  {
-				  if(objects.get(i).operator1==operatorFlag.plus&&objects.get(i).bracketNo==j)
+				  for(int i = 0;i<noOfNumbers;i++)
 				  {
-					  	answer= objects.get(i).number.add(objects.get(i+1).number,MathContext.DECIMAL64);
-					  	objects.get(i+1).number=answer;
-					  	//objects.get(i).operator2=objects.get(i+1).operator2;
-					  	objects.get(i).remove=true;
+					  if(objects.get(i).operator1==operatorFlag.plus&&objects.get(i).bracketNo==j)
+					  {
+						  	answer= objects.get(i).number.add(objects.get(i+1).number,MathContext.DECIMAL64);
+						  	objects.get(i+1).number=answer;
+						  	//objects.get(i).operator2=objects.get(i+1).operator2;
+						  	objects.get(i).remove=true;
+						  	noOfPlus--;
+					  }
 				  }
-			  }
 			  removeNumber();
+			  }
 
 		  }
 		  reset();//reset ready for a new calculation
+		  ans=answer;
 		  displayNumber(answer);//update the display with the answer
+		  answer=new BigDecimal(0);
 	  }
 }
