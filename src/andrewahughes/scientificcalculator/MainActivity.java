@@ -251,7 +251,9 @@ public class MainActivity extends Activity
 	}
 	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
 	  {	//the following calculation appends positive and negative, integer and decimal numbers as they are entered 
+
 			number=(number.multiply(BigDecimal.TEN.pow(integer))).add(subtract.multiply(input).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
+
 			digitNo= (byte) (digitNo+(1*decimal));//keeps track of decimal places etc
 			operator=' ';//clears operator from previous display
 			displayNumber(number);//updates the display
@@ -304,8 +306,8 @@ public class MainActivity extends Activity
 	  }
 	  void setOperatorFlag(operatorFlag newOperatorFlag)// a method to set the current number's flag to the operator being pressed
 	  {
-		  objects.get(objects.size()-1).operator1= newOperatorFlag;
 		  objects.get(objects.size()-1).bracketNo=currentBracket;
+		  objects.get(objects.size()-1).operator1= newOperatorFlag;
 	  }
 	  public void root()
 	  {
@@ -356,6 +358,7 @@ public class MainActivity extends Activity
 	  public void subtract()//calls plus in case the intention is subtraction, also sets next number to negative sign
 	  {
 		  operator ='-';//appends - operator to confirm button was pressed
+
 		  if(objects.get(objects.size()-1).operator1==operatorFlag.power||objects.get(objects.size()-1).operator1==operatorFlag.divide)//in the special case that the number that we..
 		  {												//...want to be negative is the power, set it to negative now 
 			  subtract=(new BigDecimal(-1));
@@ -374,6 +377,7 @@ public class MainActivity extends Activity
 			  objects.get(objects.size()-1).operator1= operatorFlag.multiply;//increment multiply counter to keep track of whether we've used multiplies and how many
 			  noOfMultiply++;
 		  }
+
 	  }
 	  public void backSpace()//undoes the last number entered
 	  {
@@ -490,7 +494,9 @@ public class MainActivity extends Activity
 	  }
 	  public void pi()
 	  {
+
 		  number = subtract.multiply((new BigDecimal(Math.PI)));//equate the current number to PI
+
 		  answer=number;//sets answer to number so we can use ans button to carry on calculation
 		  displayNumber(number);//update display
 		  numberEntered=true;
@@ -511,7 +517,9 @@ public class MainActivity extends Activity
 	  }
 	  public void ans()//answer button, sets current number to last answer
 	  {
+
 		  number = ans;//simply add current number to previous answer
+
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
