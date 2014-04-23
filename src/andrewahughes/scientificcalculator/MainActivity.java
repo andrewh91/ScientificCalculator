@@ -16,17 +16,17 @@ import java.util.List;
 public class MainActivity extends Activity 
 {
 	public enum operatorFlag{none,plus,multiply,divide,power,sqrt};//enumerators for BIDMAS order
-	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0), ans=new BigDecimal(0),subtract =new BigDecimal(1), memoryStore=new BigDecimal(0);
+	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0), ans=new BigDecimal(0),subtract =new BigDecimal(1), memoryStore=new BigDecimal(0), degree = new BigDecimal(1);
 	public byte decimal=0,integer=1,digitNo=0; 
 	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
-	public boolean inverse=false,hyperbolic=false;
+	public boolean inverse=false,hyperbolic=false,radian =true;
 	double d;//used in trig
 	int currentBracket=0,highestBracket=0, noOfNumbers=0,noOfPower=0,noOfDivide=0,noOfMultiply=0,noOfPlus=0;
 	
 	public class Objects//used for storing numbers, and their properties
 	{
 		BigDecimal number;
-		operatorFlag operator1;
+		operatorFlag operator1=operatorFlag.none;
 		int bracketNo;
 		boolean remove=false;
 		Objects(BigDecimal n) 
@@ -109,7 +109,7 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
-		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator//TODO
+		button[4].setOnLongClickListener(new View.OnLongClickListener() //use subtract operator
 		{
 			@Override
 			public boolean onLongClick(View v) {
@@ -226,6 +226,14 @@ public class MainActivity extends Activity
 				ans();//sets current number to previous answer
 			}
 		});
+		button[14].setOnLongClickListener(new View.OnLongClickListener() //memory store button
+		{
+			@Override
+			public boolean onLongClick(View v) {
+				radians();//sets stored number to current number
+				return true;
+			}
+		});
 		button[15].setOnClickListener(new View.OnClickListener() //PI button
 		{
 			@Override
@@ -267,8 +275,8 @@ public class MainActivity extends Activity
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
-		  if(objects.get(-1).operator1.compareTo(operatorFlag.power)!=0)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
-		  {
+		  if(objects.size()<=0||objects.get(objects.size()-1).operator1!=operatorFlag.power)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
+		  {	//was getting a glitch when the first number you enter is a decimal because we're trying to access objects.size()-1 when the objects.size =0
 			  decimal=1;//sets values used in appendNumber method
 			  integer=0;
 			  operator = '.';//shows the decimal point after the number to confirm we are in decimal mode
@@ -293,6 +301,10 @@ public class MainActivity extends Activity
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
+		  noOfDivide=0;
+		  noOfMultiply=0;
+		  noOfPlus=0;
+		  noOfPower=0;
 		  newNumberMode();//sets defaults to prepare for a new number,  
 		  operator = ' ';//resets the operator symbol
 	  }
@@ -354,7 +366,7 @@ public class MainActivity extends Activity
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
 		  noOfPlus++;//increment plus counter to keep track of whether we've used pluses and how many
 	  }
-	  //TODO
+	 
 	  public void subtract()//calls plus in case the intention is subtraction, also sets next number to negative sign
 	  {
 		  operator ='-';//appends - operator to confirm button was pressed
@@ -368,7 +380,8 @@ public class MainActivity extends Activity
 		  {
 			  if(objects.get(objects.size()-1).operator1==operatorFlag.none)
 			  {
-				  plus();//call plus because subtraction is the same as addition but with negative numbers
+				  newNumberMode();//make sure the next number we put in is a positive integer by default
+				  noOfPlus++;//increment plus counter to keep track of whether we've used pluses and how many
 				  objects.get(objects.size()-1).operator1=operatorFlag.plus;
 			  }
 			  numberEntered=true;
@@ -394,15 +407,19 @@ public class MainActivity extends Activity
 		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards 0 to clean up after we divided by 10 earlier
 		  displayNumber(number);//updates display
 	  }
-	  public void clear()//clears display
+	  public void clear()//clears display//TODO
 	  {
-		  newNumberMode();//prepare for  new number to be entered
-		  operator = ' ';//resets the operator symbol
+		  reset();
+		  //newNumberMode();//prepare for  new number to be entered
+		  //operator = ' ';//resets the operator symbol
+		  addNumToHistory(number);
 		  displayNumber(number);//updates display
 	  }
 	  public void sin()//uses the sin, arcsin or sinh trig function according to the value of the inverse and hyperbolic flags
 	  {
+		  number = number.divide(degree,MathContext.DECIMAL64);
 		  d=number.doubleValue();
+		 
 		  if(!inverse&&!hyperbolic)
 		  {
 			  d=Math.sin(d);
@@ -428,6 +445,7 @@ public class MainActivity extends Activity
 	  }
 	  public void cos()//uses the cos, arccos or cosh trig function according to the value of the inverse and hyperbolic flags
 	  {
+		  number = number.divide(degree,MathContext.DECIMAL64);
 		  d=number.doubleValue();
 		  if(!inverse&&!hyperbolic)
 		  {
@@ -454,6 +472,7 @@ public class MainActivity extends Activity
 	  }
 	  public void tan()//uses the tan, arctan or tanh trig function according to the value of the inverse and hyperbolic flags
 	  {
+		  number = number.divide(degree,MathContext.DECIMAL64);
 		  d=number.doubleValue();
 		  if(!inverse&&!hyperbolic)
 		  {
@@ -538,11 +557,24 @@ public class MainActivity extends Activity
 		  displayNumber(number);//update display
 		  numberEntered=true;
 	  }
+	  public void radians()
+	  {
+		  if(radian)//if not in radians...
+		  {
+			  degree = new BigDecimal(180).divide(new BigDecimal(Math.PI),MathContext.DECIMAL64);//...convert to degree
+			  radian = false;
+		  }
+		  else
+		  {
+			  degree = new BigDecimal(1);
+			  radian = true;
+		  }
+	  }
 	  public void openBracket(){
 		  highestBracket++;
 		  currentBracket++;
 		  operator ='(';
-		  displayNumber(number);
+		  //displayNumber(number);
 		 
 	  }
 	  public void closeBracket(){
@@ -550,7 +582,7 @@ public class MainActivity extends Activity
 		  operator =')';
 		  displayNumber(number);
 	  }
-	  public void removeNumber()
+	  public void removeNumber()//TODO
 	  {
 		  for(Iterator<Objects> itr = objects.iterator();itr.hasNext();)
 		  {
@@ -564,7 +596,6 @@ public class MainActivity extends Activity
 	  public void equalsOp()//method which performs calculations
 	  {
 		  addNumToHistory(number);
-		  //TODO brackets
 		  noOfNumbers=objects.size(); 
 		  for(int j=highestBracket;j>=0;j--)
 		  {
@@ -588,11 +619,20 @@ public class MainActivity extends Activity
 				  {
 					  if(objects.get(i).operator1==operatorFlag.divide&&objects.get(i).bracketNo==j)
 					  {
-						  	answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
+						  if(objects.get(i+1).number.equals(BigDecimal.ZERO))//cannot divide by zero//TODO
+						  {
+							
+						  }
+						  else
+						  {
+						    answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
 						  	objects.get(i+1).number=answer;
 						  	//objects.get(i).operator2=objects.get(i+1).operator2;
+						  }
 						  	objects.get(i).remove=true;
 						  	noOfDivide--;
+						  
+						  
 					  }
 				  }
 			  removeNumber();
