@@ -37,6 +37,7 @@ public class MainActivity extends Activity
 		}
 	}
 	List<Objects> objects =new ArrayList<Objects>();//used to store numbers and calculations in memory
+	
 	public boolean numberEntered = false;//fix bug where 0 was recorded as current number if you press two operators
 	
 	@Override
@@ -44,6 +45,8 @@ public class MainActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		objects.add(new Objects(number));
 		
 		Button[] button = new Button[16];
 		button[0]= (Button) findViewById(id.button42);//0	[4,2]
@@ -275,7 +278,7 @@ public class MainActivity extends Activity
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
-		  if(objects.size()<=0||objects.get(objects.size()-1).operator1!=operatorFlag.power)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
+		  if(objects.get(objects.size()-1).operator1!=operatorFlag.power)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
 		  {	//was getting a glitch when the first number you enter is a decimal because we're trying to access objects.size()-1 when the objects.size =0
 			  decimal=1;//sets values used in appendNumber method
 			  integer=0;
@@ -412,7 +415,10 @@ public class MainActivity extends Activity
 		  reset();
 		  //newNumberMode();//prepare for  new number to be entered
 		  //operator = ' ';//resets the operator symbol
-		  addNumToHistory(number);
+		  objects.clear();
+		  number=BigDecimal.ZERO;
+		  numberEntered=true;//this must be set to true to enter a number on the next line...
+		  addNumToHistory(number);//...need to always have a number in the objects list, simple way to avoid trying to access an object when the list is empty
 		  displayNumber(number);//updates display
 	  }
 	  public void sin()//uses the sin, arcsin or sinh trig function according to the value of the inverse and hyperbolic flags
