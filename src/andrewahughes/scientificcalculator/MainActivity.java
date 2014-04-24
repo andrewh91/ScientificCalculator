@@ -279,7 +279,7 @@ public class MainActivity extends Activity
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
 		  if(objects.get(objects.size()-1).operator1!=operatorFlag.power)//if current flag is NOT power, set decimal mode (prevents decimal exponent )
-		  {	//was getting a glitch when the first number you enter is a decimal because we're trying to access objects.size()-1 when the objects.size =0
+		  {	
 			  decimal=1;//sets values used in appendNumber method
 			  integer=0;
 			  operator = '.';//shows the decimal point after the number to confirm we are in decimal mode
@@ -625,16 +625,16 @@ public class MainActivity extends Activity
 				  {
 					  if(objects.get(i).operator1==operatorFlag.divide&&objects.get(i).bracketNo==j)
 					  {
-						  if(objects.get(i+1).number.equals(BigDecimal.ZERO))//cannot divide by zero//TODO
+						  if(objects.get(i+1).number.equals(BigDecimal.ZERO))//cannot divide by zero
 						  {
 							
 						  }
-						  else
+						  else//if we're not trying to divide by zero perform divide as normal
 						  {
 						    answer= objects.get(i).number.divide(objects.get(i+1).number,MathContext.DECIMAL64);
 						  	objects.get(i+1).number=answer;
 						  	//objects.get(i).operator2=objects.get(i+1).operator2;
-						  }
+						  }//whether trying to divide by zero or not reduce noOfDivde counter.
 						  	objects.get(i).remove=true;
 						  	noOfDivide--;
 						  
