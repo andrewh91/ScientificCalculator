@@ -16,10 +16,10 @@ import java.util.List;
 public class MainActivity extends Activity 
 {
 	public enum operatorFlag{none,plus,multiply,divide,power,sqrt};//enumerators for BIDMAS order
-	public BigDecimal number = new BigDecimal(0), answer=new BigDecimal(0), ans=new BigDecimal(0),subtract =new BigDecimal(1), memoryStore=new BigDecimal(0), degree = new BigDecimal(1);
+	public BigDecimal number = new BigDecimal(0),displayNumber = new BigDecimal(0), answer=new BigDecimal(0), ans=new BigDecimal(0),subtract =new BigDecimal(1), memoryStore=new BigDecimal(0), degree = new BigDecimal(1);
 	public byte decimal=0,integer=1,digitNo=0; 
-	public char operator = ' ',inverseChar=' ',hyperbolicChar=' ';
-	public boolean inverse=false,hyperbolic=false,radian =true;
+	public char bracket = '\0',operator = '\0',inverseChar='\0',hyperbolicChar='\0';
+	public boolean inverse=false,hyperbolic=false,radian =true,nextNoBracket=false;
 	double d;//used in trig
 	int currentBracket=0,highestBracket=0, noOfNumbers=0,noOfPower=0,noOfDivide=0,noOfMultiply=0,noOfPlus=0;
 	
@@ -263,18 +263,28 @@ public class MainActivity extends Activity
 	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
 	  {	//the following calculation appends positive and negative, integer and decimal numbers as they are entered 
 
-			number=(number.multiply(BigDecimal.TEN.pow(integer))).add(subtract.multiply(input).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
 
+		  if(!nextNoBracket)//this will make any bracket placed to the left of a number disappear when you enter a new number
+		  {
+			  bracket='\0';
+		  }
+			number=(number.multiply(BigDecimal.TEN.pow(integer))).add(subtract.multiply(input).multiply(BigDecimal.TEN.pow(-decimal*(digitNo+1),MathContext.DECIMAL64)));
+			displayNumber=number;
 			digitNo= (byte) (digitNo+(1*decimal));//keeps track of decimal places etc
-			operator=' ';//clears operator from previous display
+			operator='\0';//clears operator from previous display
 			displayNumber(number);//updates the display
 			numberEntered = true;//record the fact that the most recent action was a number being entered
 	
-	  }
+	  }//TODO fix visual glitches
 	  public void displayNumber(BigDecimal input)//updates the display, with supplied argument, could be current number or answer
 	  {
+		  if(nextNoBracket)//if we've opened a bracket...
+		  {
+			  bracket='(';//...place it left of the next number
+			  nextNoBracket=false;
+		  }
 		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
-		  text.setText(input+""+operator+inverseChar+hyperbolicChar); //sets text to the number entered, and an operator if one is pressed
+		  text.setText(bracket+""+input+""+operator+inverseChar+hyperbolicChar); //sets text to the number entered, and an operator if one is pressed
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
@@ -283,7 +293,7 @@ public class MainActivity extends Activity
 			  decimal=1;//sets values used in appendNumber method
 			  integer=0;
 			  operator = '.';//shows the decimal point after the number to confirm we are in decimal mode
-			  displayNumber(number);//updates display
+			  displayNumber(displayNumber);//updates display
 		  }
 	  }
 	  public void integerMode()//switch number entry mode to integer
@@ -293,8 +303,8 @@ public class MainActivity extends Activity
 		  digitNo = 0;//resets the number of decimal places
 		  inverse=false;
 		  hyperbolic=false;
-		  hyperbolicChar=' ';
-		  inverseChar=' ';
+		  hyperbolicChar='\0';
+		  inverseChar='\0';
 		  subtract = new BigDecimal(1);
 	  }
 	  public void newNumberMode()//set number entry mode to integer, set some other defaults too
@@ -304,12 +314,14 @@ public class MainActivity extends Activity
 	  }
 	  public void reset()//set number entry mode to integer, set some other defaults too
 	  {
+		  nextNoBracket=false;
 		  noOfDivide=0;
 		  noOfMultiply=0;
 		  noOfPlus=0;
 		  noOfPower=0;
 		  newNumberMode();//sets defaults to prepare for a new number,  
-		  operator = ' ';//resets the operator symbol
+		  operator = '\0';//resets the operator symbol
+		  displayNumber= new BigDecimal(0);
 	  }
 	  public void addNumToHistory(BigDecimal number)//adds current number to history list
 	  {
@@ -328,7 +340,7 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);//adds current number to memory
 		  operator='r';//sets the operator
-		  displayNumber(number);//updates the display with the operator
+		  displayNumber(displayNumber);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.sqrt);
 		  /*if(flag.compareTo(operatorFlag.sqrt)<0)//if current flag is of less or equal BIDMAS importance...
 		  {
@@ -340,7 +352,7 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);//adds current number to memory
 		  operator='^';//sets the operator
-		  displayNumber(number);//updates the display with the operator
+		  displayNumber(displayNumber);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.power);
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 		  noOfPower++;//increment power counter to keep track of whether we've used powers and how many
@@ -349,7 +361,7 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);//adds current number to memory
 		  operator='/';//sets the operator
-		  displayNumber(number);//updates the display with the operator
+		  displayNumber(displayNumber);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.divide);
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 		  noOfDivide++;//increment divide counter to keep track of whether we've used divides and how many
@@ -358,14 +370,14 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);//adds current number to memory
 		  operator = '*';//sets the operator
-		  displayNumber(number);//updates the display with the operator
+		  displayNumber(displayNumber);//updates the display with the operator
 		  setOperatorFlag(operatorFlag.multiply);
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 		  noOfMultiply++;//increment multply counter to keep track of whether we've used multiplies and how many
 	  }
 	  public void plus()//adds current number to memory, sets flag to plus so that plus is called during equals method
 	  {
-		  displayNumber(number);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
+		  displayNumber(displayNumber);//updates the display with the operator (which is set on the button method, because the subtract button calls this method, and changing the operator here would mean we can't have a minus operator)
 		  newNumberMode();//make sure the next number we put in is a positive integer by default
 		  noOfPlus++;//increment plus counter to keep track of whether we've used pluses and how many
 	  }
@@ -377,7 +389,7 @@ public class MainActivity extends Activity
 		  if(objects.get(objects.size()-1).operator1==operatorFlag.power||objects.get(objects.size()-1).operator1==operatorFlag.divide)//in the special case that the number that we..
 		  {												//...want to be negative is the power, set it to negative now 
 			  subtract=(new BigDecimal(-1));
-			  displayNumber(number);
+			  displayNumber(displayNumber);
 		  }
 		  else 
 		  {
@@ -388,7 +400,7 @@ public class MainActivity extends Activity
 				  objects.get(objects.size()-1).operator1=operatorFlag.plus;
 			  }
 			  numberEntered=true;
-			  displayNumber(number);
+			  displayNumber(displayNumber);
 			  addNumToHistory(new BigDecimal(-1));
 			  objects.get(objects.size()-1).operator1= operatorFlag.multiply;//increment multiply counter to keep track of whether we've used multiplies and how many
 			  noOfMultiply++;
@@ -405,10 +417,10 @@ public class MainActivity extends Activity
 		  else//if decimal places <=1 when backspace is pushed...
 		  {
 			  integerMode();//...then we have to change from decimal to integer mode 
-			  operator=' ';//clear the decimal place operator to show we have passed back into integer mode
+			  operator='\0';//clear the decimal place operator to show we have passed back into integer mode
 		  }
 		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards 0 to clean up after we divided by 10 earlier
-		  displayNumber(number);//updates display
+		  displayNumber(displayNumber);//updates display
 	  }
 	  public void clear()//clears display//TODO
 	  {
@@ -508,7 +520,7 @@ public class MainActivity extends Activity
 		  if(inverse)
 		  {
 			  inverse=false;
-			  inverseChar=' ';
+			  inverseChar='\0';
 		  }
 		  else
 		  {
@@ -531,7 +543,7 @@ public class MainActivity extends Activity
 		  if(hyperbolic)
 		  {
 			  hyperbolic=false;
-			  hyperbolicChar=' ';
+			  hyperbolicChar='\0';
 		  }
 		  else
 		  {
@@ -580,7 +592,8 @@ public class MainActivity extends Activity
 		  highestBracket++;
 		  currentBracket++;
 		  operator ='(';
-		  //displayNumber(number);
+		  nextNoBracket=true;
+		  //displayNumber(displayNumber);
 		 
 	  }
 	  public void closeBracket(){
