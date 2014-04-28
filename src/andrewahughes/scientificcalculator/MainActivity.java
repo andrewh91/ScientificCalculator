@@ -22,7 +22,6 @@ public class MainActivity extends Activity
 	public boolean inverse=false,hyperbolic=false,radian =true,nextNoBracket=false;
 	double d;//used in trig
 	int currentBracket=0,highestBracket=0, noOfNumbers=0,noOfPower=0,noOfDivide=0,noOfMultiply=0,noOfPlus=0;
-	TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
 	
 	public class Objects//used for storing numbers, and their properties
 	{
@@ -285,7 +284,8 @@ public class MainActivity extends Activity
 			  bracket=bracket+'(';//...place it left of the next number
 			  nextNoBracket=false;
 		  }
-		  
+
+		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
 		  text.setText(bracket+""+input+""+operator); //sets text to the number entered, and an operator if one is pressed
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
@@ -595,6 +595,10 @@ public class MainActivity extends Activity
 		  highestBracket++;
 		  currentBracket++;
 		  operator =operator+'(';
+		  if(objects.get(objects.size()-1).operator1==operatorFlag.none)
+		  {
+			  objects.get(objects.size()).operator1=operatorFlag.multiply;
+		  }
 		  addNumToHistory(number);
 		  displayNumber(displayNumber);
 		  nextNoBracket=true;
@@ -644,7 +648,7 @@ public class MainActivity extends Activity
 					  {
 						  if(objects.get(i+1).number.equals(BigDecimal.ZERO))//cannot divide by zero
 						  {
-							  text.setText("Cannot divide by zero"); //sets text to the number entered, and an operator if one is pressed
+							  bracket="Cannot divide by "; //sets text to the number entered, and an operator if one is pressed
 						  }
 						  else//if we're not trying to divide by zero perform divide as normal
 						  {
@@ -653,9 +657,7 @@ public class MainActivity extends Activity
 						  	//objects.get(i).operator2=objects.get(i+1).operator2;
 						  }//whether trying to divide by zero or not reduce noOfDivde counter.
 						  	objects.get(i).remove=true;
-						  	noOfDivide--;
-						  
-						  
+						  	noOfDivide--; 
 					  }
 				  }
 			  removeNumber();
@@ -692,9 +694,9 @@ public class MainActivity extends Activity
 			  }
 
 		  }
-		  reset();//reset ready for a new calculation
 		  ans=answer;
 		  displayNumber(answer);//update the display with the answer
+		  reset();//reset ready for a new calculation
 		  answer=new BigDecimal(0);
 	  }
 }
