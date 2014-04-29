@@ -47,7 +47,7 @@ public class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 		
 		objects.add(new Objects(number));
-		
+		  
 		Button[] button = new Button[16];
 		button[0]= (Button) findViewById(id.button42);//0	[4,2]
 		button[1]= (Button) findViewById(id.button11);//1	[1,1]
@@ -287,6 +287,7 @@ public class MainActivity extends Activity
 
 		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
 		  text.setText(bracket+""+input+""+operator); //sets text to the number entered, and an operator if one is pressed
+		  text.setTextSize(30*getResources().getDisplayMetrics().density);
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
@@ -584,11 +585,15 @@ public class MainActivity extends Activity
 		  {
 			  degree = new BigDecimal(180).divide(new BigDecimal(Math.PI),MathContext.DECIMAL64);//...convert to degree
 			  radian = false;
+			  Button radButton = (Button)findViewById(R.id.button43);
+			  radButton.setText("Ans | Deg");
 		  }
-		  else
+		  else//TODO
 		  {
 			  degree = new BigDecimal(1);
 			  radian = true;
+			  Button radButton = (Button)findViewById(R.id.button43);
+			  radButton.setText("Ans | Rad");
 		  }
 	  }
 	  public void openBracket(){
@@ -648,7 +653,7 @@ public class MainActivity extends Activity
 					  {
 						  if(objects.get(i+1).number.equals(BigDecimal.ZERO))//cannot divide by zero
 						  {
-							  bracket="Cannot divide by "; //sets text to the number entered, and an operator if one is pressed
+							  bracket="Cannot divide by "; //sets text to error message
 						  }
 						  else//if we're not trying to divide by zero perform divide as normal
 						  {
@@ -691,6 +696,10 @@ public class MainActivity extends Activity
 					  }
 				  }
 			  removeNumber();
+			  }
+			  else 
+			  {
+				  answer = number;//if you press equals without an operator, answer = number
 			  }
 
 		  }
