@@ -287,7 +287,7 @@ public class MainActivity extends Activity
 
 		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
 		  text.setText(bracket+""+input+""+operator); //sets text to the number entered, and an operator if one is pressed
-		  text.setTextSize(30*getResources().getDisplayMetrics().density);
+		  //text.setTextSize(30*getResources().getDisplayMetrics().density);
 	  }
 	  public void decimalMode()//switch number entry mode to decimal
 	  {
@@ -427,7 +427,7 @@ public class MainActivity extends Activity
 		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards 0 to clean up after we divided by 10 earlier
 		  displayNumber(displayNumber);//updates display
 	  }
-	  public void clear()//clears display//TODO
+	  public void clear()//clears display
 	  {
 		  reset();
 		  //newNumberMode();//prepare for  new number to be entered
@@ -588,7 +588,7 @@ public class MainActivity extends Activity
 			  Button radButton = (Button)findViewById(R.id.button43);
 			  radButton.setText("Ans | Deg");
 		  }
-		  else//TODO
+		  else
 		  {
 			  degree = new BigDecimal(1);
 			  radian = true;
@@ -599,12 +599,15 @@ public class MainActivity extends Activity
 	  public void openBracket(){
 		  highestBracket++;
 		  currentBracket++;
+		  addNumToHistory(number);
 		  operator =operator+'(';
 		  if(objects.get(objects.size()-1).operator1==operatorFlag.none)
 		  {
-			  objects.get(objects.size()).operator1=operatorFlag.multiply;
+			  setOperatorFlag(operatorFlag.multiply);
+			  noOfMultiply++;
+		  newNumberMode();
 		  }
-		  addNumToHistory(number);
+		  
 		  displayNumber(displayNumber);
 		  nextNoBracket=true;
 		 
@@ -614,7 +617,7 @@ public class MainActivity extends Activity
 		  operator =operator+')';
 		  displayNumber(displayNumber);
 	  }
-	  public void removeNumber()//TODO
+	  public void removeNumber()
 	  {
 		  for(Iterator<Objects> itr = objects.iterator();itr.hasNext();)
 		  {
@@ -697,10 +700,10 @@ public class MainActivity extends Activity
 				  }
 			  removeNumber();
 			  }
-			  else 
+			  /*if() 
 			  {
 				  answer = number;//if you press equals without an operator, answer = number
-			  }
+			  }*/
 
 		  }
 		  ans=answer;
