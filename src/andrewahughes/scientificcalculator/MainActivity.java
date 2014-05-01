@@ -273,8 +273,9 @@ public class MainActivity extends Activity
 			displayNumber=number;
 			digitNo= (byte) (digitNo+(1*decimal));//keeps track of decimal places etc
 			operator="\0";//clears operator from previous display
-			displayNumber(number);//updates the display
 			numberEntered = true;//record the fact that the most recent action was a number being entered
+			displayNumber(number);//updates the display
+			
 	
 	  }//TODO fix visual glitches
 	  public void displayNumber(BigDecimal input)//updates the display, with supplied argument, could be current number or answer
@@ -371,7 +372,7 @@ public class MainActivity extends Activity
 		  newNumberMode();//make sure the next number we enter is a positive integer by default
 		  noOfDivide++;//increment divide counter to keep track of whether we've used divides and how many
 	  }
-	  public void multiply()//adds current number to memory, sets flag o multiply for equals method
+	  public void multiply()//adds current number to memory, sets flag o multiply for equals method//TODO
 	  {
 		  addNumToHistory(number);//adds current number to memory
 		  operator = operator+'*';//sets the operator
@@ -425,7 +426,7 @@ public class MainActivity extends Activity
 			  operator="\0";//clear the decimal place operator to show we have passed back into integer mode
 		  }
 		  number = number.setScale(digitNo, BigDecimal.ROUND_DOWN);//round towards 0 to clean up after we divided by 10 earlier
-		  displayNumber(displayNumber);//updates display
+		  displayNumber(number);//updates display
 	  }
 	  public void clear()//clears display
 	  {
@@ -455,7 +456,7 @@ public class MainActivity extends Activity
 		  {
 			  d=Math.sinh(d);
 		  }
-		  else //if(inverse&&hyperbolic);
+		  //else if(inverse&&hyperbolic);
 		  {
 			  //make an inverse hyperbolic function
 		  }
@@ -463,9 +464,12 @@ public class MainActivity extends Activity
 		  displayNumber=number;
 		  answer=number;//sets answer to number so we can use ans button to carry on calculation
 		  integerMode();//clear the inverse or hyperbolic char if present
-		  displayNumber(number);
 		  numberEntered=true;
-		  newNumberMode();
+		  displayNumber(number);
+		  objects.get(objects.size()-1).operator1= operatorFlag.multiply;//increment multiply counter to keep track of whether we've used multiplies and how many
+		  addNumToHistory(new BigDecimal(1));		  
+		  noOfMultiply++;
+		  newNumberMode();//TODO
 	  }
 	  public void cos()//uses the cos, arccos or cosh trig function according to the value of the inverse and hyperbolic flags
 	  {
@@ -596,19 +600,18 @@ public class MainActivity extends Activity
 			  radButton.setText("Ans | Rad");
 		  }
 	  }
-	  public void openBracket(){
-		  highestBracket++;
-		  currentBracket++;
+	  public void openBracket(){//TODO
 		  addNumToHistory(number);
 		  operator =operator+'(';
+		  displayNumber(displayNumber);
 		  if(objects.get(objects.size()-1).operator1==operatorFlag.none)
 		  {
 			  setOperatorFlag(operatorFlag.multiply);
 			  noOfMultiply++;
-		  newNumberMode();
+			  newNumberMode();
 		  }
-		  
-		  displayNumber(displayNumber);
+		  highestBracket++;
+		  currentBracket++;
 		  nextNoBracket=true;
 		 
 	  }
@@ -632,6 +635,11 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);
 		  noOfNumbers=objects.size(); 
+		  if(noOfNumbers<2)
+		  {
+			  answer=number;
+			  removeNumber();
+		  }
 		  for(int j=highestBracket;j>=0;j--)
 		  {
 			  if(noOfPower>0)//if we've actually used powers...
