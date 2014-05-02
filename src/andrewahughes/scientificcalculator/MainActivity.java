@@ -33,11 +33,9 @@ public class MainActivity extends Activity
 		{
 			number=n;
 			bracketNo= currentBracket;
-			
 		}
 	}
 	List<Objects> objects =new ArrayList<Objects>();//used to store numbers and calculations in memory
-	
 	public boolean numberEntered = false;//fix bug where 0 was recorded as current number if you press two operators
 	
 	@Override
@@ -326,7 +324,8 @@ public class MainActivity extends Activity
 		  bracket="\0";
 		  currentBracket=0;
 		  highestBracket=0;
-		  displayNumber= new BigDecimal(0);
+		  //displayNumber= new BigDecimal(0);
+		  addNumToHistory(number);//...need to always have a number in the objects list, simple way to avoid trying to access an object when the list is empty
 		  
 	  }
 	  public void addNumToHistory(BigDecimal number)//adds current number to history list
@@ -430,13 +429,13 @@ public class MainActivity extends Activity
 	  }
 	  public void clear()//clears display
 	  {
-		  reset();
 		  //newNumberMode();//prepare for  new number to be entered
 		  //operator = ' ';//resets the operator symbol
-		  objects.clear();
-		  number=BigDecimal.ZERO;
+		  //number=BigDecimal.ZERO;
 		  numberEntered=true;//this must be set to true to enter a number on the next line...
-		  addNumToHistory(number);//...need to always have a number in the objects list, simple way to avoid trying to access an object when the list is empty
+		  objects.clear();
+		  reset();
+		  displayNumber=BigDecimal.ZERO;
 		  displayNumber(number);//updates display
 	  }
 	  public void sin()//uses the sin, arcsin or sinh trig function according to the value of the inverse and hyperbolic flags
@@ -635,11 +634,7 @@ public class MainActivity extends Activity
 	  {
 		  addNumToHistory(number);
 		  noOfNumbers=objects.size(); 
-		  if(noOfNumbers<2)
-		  {
-			  answer=number;
-			  removeNumber();
-		  }
+		  answer=number;//sets answer to the last number entered, so in the case of no operator being entered the answer will be the number entered
 		  for(int j=highestBracket;j>=0;j--)
 		  {
 			  if(noOfPower>0)//if we've actually used powers...
