@@ -710,7 +710,8 @@ public class MainActivity extends Activity
 
 		  }
 		  ans=answer;
-		  displayNumber(answer);//update the display with the answer
+		  displayNumber=answer;
+		  displayNumber(displayNumber);//update the display with the answer
 		  reset();//reset ready for a new calculation
 		  answer=new BigDecimal(0);
 	  }
