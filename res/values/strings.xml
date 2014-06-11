@@ -21,5 +21,7 @@
     <string name="button43">Ans | Rad</string>
     <string name="button44">Pi | Hyp</string>
     <string name="displayText">0</string>
+    <string name="increase_font_size">Increase font size</string>
+    <string name="decrease_font_size">Decrease font size</string>
 
 </resources>

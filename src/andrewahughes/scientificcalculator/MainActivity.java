@@ -4,9 +4,13 @@ import andrewahughes.scientificcalculator.R.id;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.awt.font.NumericShaper;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
@@ -21,14 +25,14 @@ public class MainActivity extends Activity
 	public String bracket = "\0",operator = "\0";	
 	public boolean inverse=false,hyperbolic=false,radian =true,nextNoBracket=false;
 	double d;//used in trig
-	int currentBracket=0,highestBracket=0, noOfNumbers=0,noOfPower=0,noOfDivide=0,noOfMultiply=0,noOfPlus=0;
+	int currentBracket=0,highestBracket=0, noOfNumbers=0,noOfPower=0,noOfDivide=0,noOfMultiply=0,noOfPlus=0,fontSize=20;
 	
 	public class Objects//used for storing numbers, and their properties
 	{
-		BigDecimal number;
 		operatorFlag operator1=operatorFlag.none;
 		int bracketNo;
 		boolean remove=false;
+		BigDecimal number;
 		Objects(BigDecimal n) 
 		{
 			number=n;
@@ -63,6 +67,10 @@ public class MainActivity extends Activity
 		button[13]= (Button) findViewById(id.button41);//d	[4,1]
 		button[14]= (Button) findViewById(id.button43);//e	[4,3]
 		button[15]= (Button) findViewById(id.button44);//f	[4,4]
+		for (int j=0;j<16;j++)
+		{
+			button[j].setTextSize(fontSize);
+		}
 		for (int i = 0; i < 10; i++)
 		{
 			final BigDecimal input = new BigDecimal(i);
@@ -258,6 +266,25 @@ public class MainActivity extends Activity
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	public boolean OnOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		case R.id.increase_font_size:
+			fontSize++;
+			Toast.makeText(MainActivity.this, "Font Size = "+fontSize, Toast.LENGTH_SHORT).show();
+			return true;
+		case R.id.decrease_font_size:
+			fontSize--;
+			Toast.makeText(MainActivity.this, "Font Size = "+fontSize, Toast.LENGTH_SHORT).show();
+			return true;
+		case R.id.action_settings:
+			Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item); 
+		}
+	}
 	  public void appendNumber(View view,BigDecimal input)//used to enter digits one after another in a traditional calculator fashion
 	  {	//the following calculation appends positive and negative, integer and decimal numbers as they are entered 
 
@@ -283,8 +310,9 @@ public class MainActivity extends Activity
 			  bracket=bracket+'(';//...place it left of the next number
 			  nextNoBracket=false;
 		  }
-
+		  
 		  TextView text = (TextView) findViewById(id.displayText);//text view at the top of the screen
+		  text.setTextSize(fontSize);
 		  text.setText(bracket+""+input+""+operator); //sets text to the number entered, and an operator if one is pressed
 		  //text.setTextSize(30*getResources().getDisplayMetrics().density);
 	  }
@@ -540,7 +568,7 @@ public class MainActivity extends Activity
 	  }
 	  public void pi()
 	  {
-
+		  
 		  number = subtract.multiply((new BigDecimal(Math.PI)));//equate the current number to PI
 		  displayNumber=number;
 		  answer=number;//sets answer to number so we can use ans button to carry on calculation
@@ -617,6 +645,15 @@ public class MainActivity extends Activity
 	  public void closeBracket(){
 		  currentBracket--;
 		  operator =operator+')';
+		  numberEntered=true;
+		  addNumToHistory(displayNumber);
+		  newNumberMode();
+		  if(objects.get(objects.size()-1).operator1==operatorFlag.none)
+		  {
+			  setOperatorFlag(operatorFlag.multiply);
+			  noOfMultiply++;
+			  newNumberMode();
+		  }
 		  displayNumber(displayNumber);
 	  }
 	  public void removeNumber()

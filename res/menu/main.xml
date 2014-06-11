@@ -1,5 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
+    
+    <item  
+        android:id="@+id/increase_font_size"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/increase_font_size"/>
+    <item  
+        android:id="@+id/decrease_font_size"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/decrease_font_size"/>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

@@ -24,7 +24,7 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080015;
+        public static final int action_settings=0x7f080017;
         public static final int button11=0x7f080002;
         public static final int button12=0x7f080003;
         public static final int button13=0x7f080004;
@@ -41,7 +41,9 @@ public final class R {
         public static final int button42=0x7f080012;
         public static final int button43=0x7f080013;
         public static final int button44=0x7f080014;
+        public static final int decrease_font_size=0x7f080016;
         public static final int displayText=0x7f080000;
+        public static final int increase_font_size=0x7f080015;
         public static final int tableRow2=0x7f080001;
         public static final int tableRow3=0x7f080006;
         public static final int tableRow4=0x7f08000b;
@@ -72,8 +74,10 @@ public final class R {
         public static final int button42=0x7f050010;
         public static final int button43=0x7f050011;
         public static final int button44=0x7f050012;
+        public static final int decrease_font_size=0x7f050015;
         public static final int displayText=0x7f050013;
         public static final int hello_world=0x7f050002;
+        public static final int increase_font_size=0x7f050014;
     }
     public static final class style {
         /** 
